@@ -255,6 +255,20 @@ background:#fff;
 transform:translateY(-5px)
 }
 
+
+/* КЛИКАБЕЛЬНАЯ КАРТОЧКА КАБИНЕТА */
+
+.card-link{
+display:flex;
+color:inherit;
+text-decoration:none;
+cursor:pointer
+}
+
+.card-link:hover{
+color:inherit
+}
+
 .card small{
 color:#999
 }
@@ -843,12 +857,6 @@ font-size:10px
 /* SUPPORT НЕ МЕШАЕТ AI */
 /* ============================= */
 
-/*
-Когда AI Assistant открыт,
-круглая кнопка SUPPORT полностью
-убирается с мобильного экрана.
-*/
-
 .support.ai-mobile-hidden{
 opacity:0;
 visibility:hidden;
@@ -992,10 +1000,6 @@ padding-right:12px
 
 <a href="#contact">
 Контакты
-</a>
-
-<a href="personal.html">
-Личный кабинет
 </a>
 
 </nav>
@@ -1198,7 +1202,10 @@ padding-right:12px
 </div>
 
 
-<div class="card">
+<a
+class="card card-link"
+href="personal.html"
+>
 
 <small>
 003
@@ -1221,7 +1228,7 @@ padding-right:12px
 ↗
 </div>
 
-</div>
+</a>
 
 
 </div>
