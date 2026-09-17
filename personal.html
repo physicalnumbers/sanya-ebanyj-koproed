@@ -102,6 +102,11 @@ transition:.2s
 background:#333
 }
 
+.button:disabled{
+opacity:.5;
+cursor:not-allowed
+}
+
 .card{
 display:none;
 max-width:650px;
@@ -115,11 +120,49 @@ border:1px solid #ddd
 display:block
 }
 
+.profile-form{
+display:flex;
+flex-direction:column;
+gap:20px
+}
+
+.field{
+display:flex;
+flex-direction:column;
+gap:8px
+}
+
+.field label{
+font-size:13px;
+color:#555
+}
+
+.field input,
+.field textarea{
+width:100%;
+padding:14px;
+font:14px Arial,sans-serif;
+border:1px solid #ccc;
+background:#fff;
+color:#111;
+outline:none
+}
+
+.field input:focus,
+.field textarea:focus{
+border-color:#111
+}
+
+.field textarea{
+min-height:130px;
+resize:vertical
+}
+
 .user{
 display:flex;
 align-items:center;
 gap:18px;
-margin-bottom:25px
+margin-bottom:30px
 }
 
 .avatar{
@@ -140,11 +183,17 @@ margin-top:5px;
 color:#777
 }
 
-.status{
-margin-top:25px;
-padding-top:20px;
-border-top:1px solid #ddd;
-color:#666
+.save-button{
+margin-top:5px
+}
+
+.message{
+display:none;
+margin-top:20px;
+padding:15px;
+border:1px solid #ccc;
+background:#fafafa;
+color:#555
 }
 
 .error{
@@ -154,6 +203,17 @@ padding:15px;
 background:#fff0f0;
 border:1px solid #ffb5b5;
 color:#b00000
+}
+
+.logout{
+margin-top:15px;
+background:#fff;
+color:#111;
+border:1px solid #ccc
+}
+
+.logout:hover{
+background:#eee
 }
 
 @media(max-width:800px){
@@ -246,7 +306,7 @@ alt="Аватар"
 
 <div>
 
-<div class="user-name" id="userName">
+<div class="user-name" id="googleName">
 Пользователь
 </div>
 
@@ -257,16 +317,71 @@ alt="Аватар"
 
 </div>
 
-<div class="status">
-Google-аккаунт успешно подключён.
-<br><br>
-Следующим шагом добавим настройки профиля.
+
+<div class="profile-form">
+
+<div class="field">
+
+<label for="nickname">
+Никнейм
+</label>
+
+<input
+type="text"
+id="nickname"
+maxlength="30"
+placeholder="Введите никнейм"
+>
+
+</div>
+
+
+<div class="field">
+
+<label for="profileDescription">
+Описание профиля
+</label>
+
+<textarea
+id="profileDescription"
+maxlength="300"
+placeholder="Расскажите немного о себе"
+></textarea>
+
+</div>
+
+
+<button
+class="button save-button"
+id="saveButton"
+>
+Сохранить профиль
+</button>
+
+<button
+class="button logout"
+id="logoutButton"
+>
+Выйти из аккаунта
+</button>
+
+</div>
+
+
+<div
+class="message"
+id="successMessage"
+>
+Профиль сохранён.
 </div>
 
 </div>
 
 
-<div class="error" id="errorBox"></div>
+<div
+class="error"
+id="errorBox"
+></div>
 
 </section>
 
@@ -283,8 +398,16 @@ import {
 getAuth,
 GoogleAuthProvider,
 signInWithPopup,
-onAuthStateChanged
+onAuthStateChanged,
+signOut
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+import {
+getFirestore,
+doc,
+getDoc,
+setDoc
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 
 const firebaseConfig = {
@@ -310,6 +433,8 @@ const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
 
+const db = getFirestore(app);
+
 const provider = new GoogleAuthProvider();
 
 
@@ -322,14 +447,29 @@ document.getElementById("description");
 const accountCard =
 document.getElementById("accountCard");
 
-const userName =
-document.getElementById("userName");
+const googleName =
+document.getElementById("googleName");
 
 const userEmail =
 document.getElementById("userEmail");
 
 const avatar =
 document.getElementById("avatar");
+
+const nickname =
+document.getElementById("nickname");
+
+const profileDescription =
+document.getElementById("profileDescription");
+
+const saveButton =
+document.getElementById("saveButton");
+
+const logoutButton =
+document.getElementById("logoutButton");
+
+const successMessage =
+document.getElementById("successMessage");
 
 const errorBox =
 document.getElementById("errorBox");
@@ -344,9 +484,32 @@ errorBox.style.display = "block";
 }
 
 
-loginButton.addEventListener("click", async () => {
+function hideError(){
 
 errorBox.style.display = "none";
+
+}
+
+
+function showSuccess(message){
+
+successMessage.textContent = message;
+
+successMessage.style.display = "block";
+
+}
+
+
+function hideSuccess(){
+
+successMessage.style.display = "none";
+
+}
+
+
+loginButton.addEventListener("click", async () => {
+
+hideError();
 
 loginButton.disabled = true;
 
@@ -358,7 +521,6 @@ try{
 await signInWithPopup(auth,provider);
 
 }
-
 catch(error){
 
 console.error(error);
@@ -370,7 +532,9 @@ showError("Окно входа было закрыто.");
 }
 else if(error.code === "auth/popup-blocked"){
 
-showError("Браузер заблокировал окно Google. Разреши всплывающие окна для сайта.");
+showError(
+"Браузер заблокировал окно Google."
+);
 
 }
 else{
@@ -391,22 +555,176 @@ loginButton.textContent = "Создать кабинет";
 });
 
 
-onAuthStateChanged(auth,(user) => {
+async function loadProfile(user){
+
+try{
+
+const userRef =
+doc(db,"users",user.uid);
+
+const userSnapshot =
+await getDoc(userRef);
+
+
+if(userSnapshot.exists()){
+
+const data =
+userSnapshot.data();
+
+nickname.value =
+data.nickname || "";
+
+profileDescription.value =
+data.description || "";
+
+}
+
+}
+catch(error){
+
+console.error(error);
+
+showError(
+"Не удалось загрузить профиль. Код ошибки: " +
+error.code
+);
+
+}
+
+}
+
+
+saveButton.addEventListener("click", async () => {
+
+const user = auth.currentUser;
+
+if(!user){
+
+showError(
+"Сначала войдите через Google."
+);
+
+return;
+
+}
+
+
+hideError();
+
+hideSuccess();
+
+const nicknameValue =
+nickname.value.trim();
+
+const descriptionValue =
+profileDescription.value.trim();
+
+
+if(!nicknameValue){
+
+showError(
+"Введите никнейм."
+);
+
+return;
+
+}
+
+
+saveButton.disabled = true;
+
+saveButton.textContent = "Сохранение...";
+
+
+try{
+
+const userRef =
+doc(db,"users",user.uid);
+
+
+await setDoc(
+userRef,
+{
+nickname: nicknameValue,
+description: descriptionValue,
+email: user.email || "",
+googleName: user.displayName || "",
+updatedAt: new Date().toISOString()
+},
+{
+merge:true
+}
+);
+
+
+showSuccess(
+"Профиль сохранён."
+);
+
+}
+catch(error){
+
+console.error(error);
+
+showError(
+"Не удалось сохранить профиль. Код ошибки: " +
+error.code
+);
+
+}
+
+
+saveButton.disabled = false;
+
+saveButton.textContent =
+"Сохранить профиль";
+
+});
+
+
+logoutButton.addEventListener("click", async () => {
+
+try{
+
+await signOut(auth);
+
+}
+catch(error){
+
+console.error(error);
+
+showError(
+"Не удалось выйти из аккаунта."
+);
+
+}
+
+});
+
+
+onAuthStateChanged(auth, async (user) => {
+
+hideError();
+
+hideSuccess();
+
 
 if(user){
 
 description.textContent =
-"Ваш личный кабинет уже создан.";
+"Настройте информацию своего профиля.";
 
 loginButton.style.display = "none";
 
 accountCard.classList.add("active");
 
-userName.textContent =
+
+googleName.textContent =
 user.displayName || "Пользователь";
 
 userEmail.textContent =
 user.email || "";
+
 
 if(user.photoURL){
 
@@ -414,15 +732,23 @@ avatar.src = user.photoURL;
 
 }
 
+
+await loadProfile(user);
+
 }
 else{
 
 description.textContent =
 "У вас пока нет личного кабинета. Создать его можно через Google.";
 
-loginButton.style.display = "inline-flex";
+loginButton.style.display =
+"inline-flex";
 
 accountCard.classList.remove("active");
+
+nickname.value = "";
+
+profileDescription.value = "";
 
 }
 
