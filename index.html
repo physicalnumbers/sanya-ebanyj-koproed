@@ -187,6 +187,8 @@ object-fit:cover
 }
 
 
+/* Заголовки */
+
 .head{
 display:flex;
 justify-content:space-between;
@@ -219,6 +221,9 @@ border-bottom:1px solid #ccc
 .item span:last-child{
 color:#888
 }
+
+
+/* Карточки */
 
 .cards{
 display:grid;
@@ -344,6 +349,8 @@ color:#555
 }
 
 .ai-message.typing{
+align-self:flex-start;
+background:#f0f0f0;
 color:#888
 }
 
@@ -400,12 +407,6 @@ text-align:center
 }
 
 
-/* Контакты */
-
-.contact-section{
-}
-
-
 /* Footer */
 
 footer{
@@ -425,6 +426,9 @@ font-size:25px
 .copy{
 color:#888
 }
+
+
+/* Анимации */
 
 .reveal{
 opacity:0;
@@ -762,7 +766,7 @@ width:90px
 </section>
 
 
-<section id="contact" class="contact-section">
+<section id="contact">
 
 <div class="head">
 
@@ -858,7 +862,7 @@ Enter — отправить · Shift + Enter — новая строка
 </footer>
 
 
-<!-- Круглая кнопка SUPPORT -->
+<!-- SUPPORT -->
 
 <a
 class="support"
@@ -873,7 +877,7 @@ aria-label="Открыть AI Assistant"
 <script>
 
 /* ============================= */
-/* Анимации сайта */
+/* АНИМАЦИИ */
 /* ============================= */
 
 const elements=document.querySelectorAll(
@@ -901,7 +905,7 @@ observer.observe(element);
 
 
 /* ============================= */
-/* Параллакс заголовка */
+/* ПАРАЛЛАКС */
 /* ============================= */
 
 addEventListener("scroll",()=>{
@@ -917,10 +921,11 @@ document.querySelector("h1").style.translate=
 
 
 /* ============================= */
-/* Кнопка SUPPORT */
+/* SUPPORT */
 /* ============================= */
 
-const support=document.querySelector(".support");
+const support=
+document.querySelector(".support");
 
 let scrollTimer;
 
@@ -946,6 +951,7 @@ support.classList.remove("scrolling");
 const AI_URL =
 "https://call-server-proxy.dmetro2484285.workers.dev";
 
+
 const aiInput =
 document.getElementById("aiInput");
 
@@ -956,11 +962,21 @@ const aiMessages =
 document.getElementById("aiMessages");
 
 
-/* Добавление сообщения */
+/* ================================= */
+/* ПАМЯТЬ ТЕКУЩЕГО ДИАЛОГА */
+/* ================================= */
+
+let chatHistory = [];
+
+
+/* ================================= */
+/* ДОБАВИТЬ СООБЩЕНИЕ НА ЭКРАН */
+/* ================================= */
 
 function addMessage(text,type){
 
-const message=document.createElement("div");
+const message=
+document.createElement("div");
 
 message.className=
 "ai-message " + type;
@@ -977,36 +993,62 @@ return message;
 }
 
 
-/* Отправка сообщения */
+/* ================================= */
+/* ОТПРАВКА СООБЩЕНИЯ */
+/* ================================= */
 
 async function sendAIMessage(){
 
 const message=
 aiInput.value.trim();
 
+
 if(!message || aiSend.disabled){
 return;
 }
 
 
-/* Сообщение пользователя */
+/* Показываем сообщение пользователя */
 
-addMessage(message,"user");
+addMessage(
+message,
+"user"
+);
+
+
+/* Сохраняем сообщение в память */
+
+chatHistory.push({
+role:"user",
+content:message
+});
+
+
+/* Очищаем поле */
 
 aiInput.value="";
+
 aiInput.style.height="52px";
 
+
+/* Блокируем кнопку */
+
 aiSend.disabled=true;
-aiSend.textContent="Думаю...";
+
+aiSend.textContent=
+"Думаю...";
 
 
-/* Индикатор загрузки */
+/* Показываем индикатор */
 
 const typing=
-addMessage("AI Assistant печатает...","typing");
+addMessage(
+"AI Assistant печатает...",
+"typing"
+);
 
 
-/* Таймер защиты от зависания */
+/* Защита от зависания */
 
 const controller=
 new AbortController();
@@ -1021,18 +1063,32 @@ controller.abort();
 
 try{
 
+/* ============================= */
+/* ОТПРАВКА НА WORKER */
+/* ============================= */
+
 const response=
 await fetch(
 AI_URL,
 {
 method:"POST",
+
 headers:{
-"Content-Type":"application/json"
+"Content-Type":
+"application/json"
 },
+
 body:JSON.stringify({
-message:message
+
+message:message,
+
+history:chatHistory
+  .slice(-12)
+
 }),
+
 signal:controller.signal
+
 }
 );
 
@@ -1054,8 +1110,14 @@ const data=
 await response.json();
 
 
+/* Убираем индикатор */
+
 typing.remove();
 
+
+/* ============================= */
+/* ОТВЕТ AI */
+/* ============================= */
 
 if(data.reply){
 
@@ -1064,10 +1126,33 @@ data.reply,
 "assistant"
 );
 
+
+/* Сохраняем ответ AI */
+
+chatHistory.push({
+
+role:"assistant",
+
+content:data.reply
+
+});
+
+
+/* Ограничиваем память */
+
+if(chatHistory.length>12){
+
+chatHistory=
+chatHistory.slice(-12);
+
+}
+
+
 }else if(data.error){
 
 addMessage(
-"AI Assistant: " + data.error,
+"AI Assistant: " +
+data.error,
 "error"
 );
 
@@ -1109,7 +1194,9 @@ console.error(error);
 }finally{
 
 aiSend.disabled=false;
-aiSend.textContent="Отправить";
+
+aiSend.textContent=
+"Отправить";
 
 aiInput.focus();
 
@@ -1118,7 +1205,9 @@ aiInput.focus();
 }
 
 
-/* Кнопка отправки */
+/* ============================= */
+/* КНОПКА ОТПРАВИТЬ */
+/* ============================= */
 
 aiSend.addEventListener(
 "click",
@@ -1126,7 +1215,9 @@ sendAIMessage
 );
 
 
-/* Enter = отправить */
+/* ============================= */
+/* ENTER */
+/* ============================= */
 
 aiInput.addEventListener(
 "keydown",
@@ -1147,13 +1238,16 @@ sendAIMessage();
 );
 
 
-/* Автоматическое увеличение textarea */
+/* ============================= */
+/* АВТОРАЗМЕР TEXTAREA */
+/* ============================= */
 
 aiInput.addEventListener(
 "input",
 ()=>{
 
-aiInput.style.height="auto";
+aiInput.style.height=
+"auto";
 
 aiInput.style.height=
 Math.min(
@@ -1166,7 +1260,7 @@ aiInput.scrollHeight,
 
 
 /* ============================= */
-/* SUPPORT -> AI ASSISTANT */
+/* SUPPORT → AI ASSISTANT */
 /* ============================= */
 
 document
@@ -1177,16 +1271,23 @@ event=>{
 
 event.preventDefault();
 
+
 document
 .getElementById("ai-assistant")
 .scrollIntoView({
+
 behavior:"smooth",
+
 block:"start"
+
 });
+
 
 setTimeout(
 ()=>{
+
 aiInput.focus();
+
 },
 700
 );
