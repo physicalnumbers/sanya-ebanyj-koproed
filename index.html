@@ -6,6 +6,7 @@
 <title>Физические Номера</title>
 
 <style>
+
 *{
 box-sizing:border-box;
 margin:0
@@ -130,11 +131,13 @@ transform:translateY(-3px)
 }
 
 
-/* Кнопка поддержки */
+/* ============================= */
+/* КНОПКА SUPPORT */
+/* ============================= */
 
 .support{
 position:fixed;
-z-index:9999;
+z-index:10001;
 right:25px;
 bottom:25px;
 width:90px;
@@ -187,7 +190,9 @@ object-fit:cover
 }
 
 
-/* Заголовки */
+/* ============================= */
+/* ЗАГОЛОВКИ */
+/* ============================= */
 
 .head{
 display:flex;
@@ -223,7 +228,9 @@ color:#888
 }
 
 
-/* Карточки */
+/* ============================= */
+/* КАРТОЧКИ */
+/* ============================= */
 
 .cards{
 display:grid;
@@ -270,107 +277,210 @@ font-size:25px
 
 
 /* ============================= */
-/* AI ASSISTANT */
+/* AI ASSISTANT — ВЫЕЗЖАЮЩЕЕ ОКНО */
 /* ============================= */
 
-.ai-section{
-min-height:100vh;
-padding:120px 7vw;
+.ai-overlay{
+position:fixed;
+z-index:10000;
+left:0;
+top:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.18);
+backdrop-filter:blur(4px);
+
+opacity:0;
+visibility:hidden;
+
+transition:
+opacity .35s ease,
+visibility .35s ease
+}
+
+.ai-overlay.open{
+opacity:1;
+visibility:visible
+}
+
+
+.ai-panel{
+position:absolute;
+left:50%;
+bottom:0;
+
+width:min(1000px, calc(100% - 40px));
+height:min(720px, calc(100% - 40px));
+
+transform:translate(-50%, 110%);
+
 background:#f5f5f5;
-border-bottom:1px solid #d8d8d8;
-scroll-margin-top:20px
-}
+border:1px solid #ccc;
 
-.ai-header{
 display:flex;
-justify-content:space-between;
-margin-bottom:55px
+flex-direction:column;
+
+box-shadow:
+0 -10px 50px rgba(0,0,0,.18);
+
+transition:
+transform .45s cubic-bezier(.22,1,.36,1)
 }
 
-.ai-title{
-font-size:clamp(42px,6vw,80px);
-font-weight:500;
-letter-spacing:-4px
+.ai-overlay.open .ai-panel{
+transform:translate(-50%,0)
+}
+
+
+/* Верхняя часть */
+
+.ai-top{
+height:85px;
+min-height:85px;
+
+padding:0 28px;
+
+display:flex;
+align-items:center;
+justify-content:space-between;
+
+border-bottom:1px solid #ccc;
+background:#f5f5f5
+}
+
+.ai-top-left{
+display:flex;
+flex-direction:column;
+gap:7px
 }
 
 .ai-status{
 color:#888;
-font-size:13px;
+font-size:11px;
 letter-spacing:2px;
 text-transform:uppercase
 }
 
-.ai-box{
-width:100%;
-max-width:1000px;
-margin:0 auto;
+.ai-title{
+font-size:30px;
+font-weight:500;
+letter-spacing:-1px
+}
+
+
+/* Кнопка закрытия */
+
+.ai-close{
+width:44px;
+height:44px;
+
 border:1px solid #ccc;
 background:#fff;
+
 display:flex;
-flex-direction:column;
-height:600px
+align-items:center;
+justify-content:center;
+
+font-size:25px;
+font-weight:300;
+
+cursor:pointer;
+
+transition:.25s
 }
+
+.ai-close:hover{
+background:#111;
+color:#fff;
+border-color:#111
+}
+
+
+/* Сообщения */
 
 .ai-messages{
 flex:1;
+
 overflow-y:auto;
-padding:30px;
+
+padding:28px;
+
 display:flex;
 flex-direction:column;
-gap:18px;
+gap:16px;
+
 scroll-behavior:smooth
 }
 
 .ai-message{
 max-width:75%;
-padding:15px 18px;
+
+padding:14px 17px;
+
 font-size:15px;
 line-height:1.55;
+
 white-space:pre-wrap;
 word-break:break-word
 }
 
 .ai-message.user{
 align-self:flex-end;
+
 background:#111;
 color:#fff
 }
 
 .ai-message.assistant{
 align-self:flex-start;
-background:#f0f0f0;
+
+background:#e9e9e9;
 color:#111
 }
 
 .ai-message.error{
 align-self:flex-start;
+
 background:#eee;
 color:#555
 }
 
 .ai-message.typing{
 align-self:flex-start;
-background:#f0f0f0;
+
+background:#e9e9e9;
 color:#888
 }
 
+
+/* Поле ввода */
+
 .ai-input-area{
 border-top:1px solid #ccc;
+
 padding:18px;
+
 display:flex;
 gap:12px;
+
 background:#fff
 }
 
 .ai-input{
 flex:1;
+
 min-height:52px;
 max-height:130px;
+
 resize:none;
+
 border:1px solid #ccc;
 outline:none;
+
 padding:15px;
+
 font:14px Arial;
+
 color:#111;
 background:#f8f8f8
 }
@@ -379,14 +489,22 @@ background:#f8f8f8
 border-color:#999
 }
 
+
+/* Кнопка отправки */
+
 .ai-send{
 width:130px;
 height:52px;
+
 border:1px solid #111;
+
 background:#111;
 color:#fff;
+
 cursor:pointer;
+
 font:14px Arial;
+
 transition:.25s
 }
 
@@ -399,21 +517,34 @@ opacity:.45;
 cursor:not-allowed
 }
 
+
+/* Подсказка */
+
 .ai-hint{
-margin-top:15px;
+padding:0 18px 14px;
+
 color:#999;
-font-size:12px;
-text-align:center
+
+font-size:11px;
+
+text-align:center;
+
+background:#fff
 }
 
 
-/* Footer */
+/* ============================= */
+/* FOOTER */
+/* ============================= */
 
 footer{
 min-height:220px;
+
 padding:45px 7vw;
+
 background:#111;
 color:#fff;
+
 display:flex;
 justify-content:space-between;
 align-items:flex-end
@@ -428,7 +559,9 @@ color:#888
 }
 
 
-/* Анимации */
+/* ============================= */
+/* АНИМАЦИИ */
+/* ============================= */
 
 .reveal{
 opacity:0;
@@ -473,7 +606,9 @@ transform:none
 }
 
 
-/* Мобильная версия */
+/* ============================= */
+/* МОБИЛЬНАЯ ВЕРСИЯ */
+/* ============================= */
 
 @media(max-width:800px){
 
@@ -531,22 +666,39 @@ gap:50px
 
 footer{
 padding:35px 25px;
+
 flex-direction:column;
 align-items:flex-start;
+
 gap:30px
 }
 
-.ai-section{
-padding:80px 25px
+
+/* AI на телефоне */
+
+.ai-panel{
+width:100%;
+height:calc(100% - 20px);
+
+border-left:0;
+border-right:0;
+border-bottom:0
 }
 
-.ai-header{
-flex-direction:column;
-gap:20px
+.ai-top{
+height:75px;
+min-height:75px;
+
+padding:0 18px
 }
 
-.ai-box{
-height:600px
+.ai-title{
+font-size:25px
+}
+
+.ai-close{
+width:40px;
+height:40px
 }
 
 .ai-messages{
@@ -565,11 +717,22 @@ padding:12px
 width:90px
 }
 
+.ai-hint{
+padding-bottom:10px
 }
+
+}
+
 </style>
 </head>
 
+
 <body>
+
+
+<!-- ============================= -->
+<!-- HEADER -->
+<!-- ============================= -->
 
 <header>
 
@@ -578,15 +741,32 @@ width:90px
 </div>
 
 <nav>
-<a href="#about">О проекте</a>
-<a href="#services">Возможности</a>
-<a href="#contact">Контакты</a>
+
+<a href="#about">
+О проекте
+</a>
+
+<a href="#services">
+Возможности
+</a>
+
+<a href="#contact">
+Контакты
+</a>
+
 </nav>
 
 </header>
 
 
+<!-- ============================= -->
+<!-- ОСНОВНОЙ САЙТ -->
+<!-- ============================= -->
+
 <main>
+
+
+<!-- HERO -->
 
 <section class="hero">
 
@@ -619,6 +799,10 @@ width:90px
 </section>
 
 
+<!-- ============================= -->
+<!-- О ПРОЕКТЕ -->
+<!-- ============================= -->
+
 <section id="about">
 
 <div class="head">
@@ -646,23 +830,46 @@ width:90px
 <div class="list">
 
 <div class="item">
-<span>Физические устройства</span>
-<span>01</span>
+<span>
+Физические устройства
+</span>
+
+<span>
+01
+</span>
 </div>
 
-<div class="item">
-<span>Управление номерами</span>
-<span>02</span>
-</div>
 
 <div class="item">
-<span>История операций</span>
-<span>03</span>
+<span>
+Управление номерами
+</span>
+
+<span>
+02
+</span>
 </div>
 
+
 <div class="item">
-<span>Личный кабинет</span>
-<span>04</span>
+<span>
+История операций
+</span>
+
+<span>
+03
+</span>
+</div>
+
+
+<div class="item">
+<span>
+Личный кабинет
+</span>
+
+<span>
+04
+</span>
 </div>
 
 </div>
@@ -671,6 +878,10 @@ width:90px
 
 </section>
 
+
+<!-- ============================= -->
+<!-- ВОЗМОЖНОСТИ -->
+<!-- ============================= -->
 
 <section id="services">
 
@@ -690,9 +901,12 @@ width:90px
 
 <div class="cards">
 
+
 <div class="card">
 
-<small>001</small>
+<small>
+001
+</small>
 
 <div>
 
@@ -716,7 +930,9 @@ width:90px
 
 <div class="card">
 
-<small>002</small>
+<small>
+002
+</small>
 
 <div>
 
@@ -740,7 +956,9 @@ width:90px
 
 <div class="card">
 
-<small>003</small>
+<small>
+003
+</small>
 
 <div>
 
@@ -761,10 +979,15 @@ width:90px
 
 </div>
 
+
 </div>
 
 </section>
 
+
+<!-- ============================= -->
+<!-- КОНТАКТЫ -->
+<!-- ============================= -->
 
 <section id="contact">
 
@@ -789,28 +1012,75 @@ Telegram или форму обратной связи.
 </section>
 
 
+</main>
+
+
+<!-- ============================= -->
+<!-- FOOTER -->
+<!-- ============================= -->
+
+<footer>
+
+<div class="footer-title">
+Физические Номера
+</div>
+
+<div class="copy">
+© 2026
+</div>
+
+</footer>
+
+
 <!-- ============================= -->
 <!-- AI ASSISTANT -->
 <!-- ============================= -->
 
-<section id="ai-assistant" class="ai-section">
+<div
+id="aiOverlay"
+class="ai-overlay"
+>
 
-<div class="ai-header">
+<div
+class="ai-panel"
+>
+
+
+<!-- Верхняя панель -->
+
+<div class="ai-top">
+
+<div class="ai-top-left">
 
 <div class="ai-status">
 AI ASSISTANT / ONLINE
 </div>
 
-<h2 class="ai-title">
+<div class="ai-title">
 AI Assistant
-</h2>
+</div>
 
 </div>
 
 
-<div class="ai-box">
+<button
+id="aiClose"
+class="ai-close"
+type="button"
+aria-label="Закрыть AI Assistant"
+>
+×
+</button>
 
-<div class="ai-messages" id="aiMessages">
+</div>
+
+
+<!-- Сообщения -->
+
+<div
+class="ai-messages"
+id="aiMessages"
+>
 
 <div class="ai-message assistant">
 Привет! Я AI Assistant. Напиши свой вопрос, и я постараюсь помочь.
@@ -818,6 +1088,8 @@ AI Assistant
 
 </div>
 
+
+<!-- Поле ввода -->
 
 <div class="ai-input-area">
 
@@ -838,69 +1110,78 @@ type="button"
 
 </div>
 
-</div>
 
 <div class="ai-hint">
 Enter — отправить · Shift + Enter — новая строка
 </div>
 
-</section>
 
-</main>
-
-
-<footer>
-
-<div class="footer-title">
-Физические Номера
 </div>
 
-<div class="copy">
-© 2026
 </div>
 
-</footer>
 
-
+<!-- ============================= -->
 <!-- SUPPORT -->
+<!-- ============================= -->
 
 <a
 class="support"
-href="#ai-assistant"
+href="#"
 id="supportButton"
 aria-label="Открыть AI Assistant"
 >
-<img src="support.png" alt="SUPPORT">
+
+<img
+src="support.png"
+alt="SUPPORT"
+>
+
 </a>
 
 
 <script>
 
+
 /* ============================= */
 /* АНИМАЦИИ */
 /* ============================= */
 
-const elements=document.querySelectorAll(
+const elements =
+document.querySelectorAll(
 "#about .head,#about .info,#services .head,#services .cards,#contact .head,#contact .desc,.card"
 );
 
-const observer=new IntersectionObserver(
+
+const observer =
+new IntersectionObserver(
 entries=>{
+
 entries.forEach(entry=>{
+
 if(entry.isIntersecting){
+
 entry.target.classList.add("show");
+
 observer.unobserve(entry.target);
+
 }
+
 });
+
 },
 {
 threshold:.15
 }
 );
 
+
 elements.forEach(element=>{
+
 element.classList.add("reveal");
+
 observer.observe(element);
+
 });
 
 
@@ -912,7 +1193,7 @@ addEventListener("scroll",()=>{
 
 if(scrollY<innerHeight){
 
-document.querySelector("h1").style.translate=
+document.querySelector("h1").style.translate =
 `0 ${scrollY*.08}px`;
 
 }
@@ -924,10 +1205,12 @@ document.querySelector("h1").style.translate=
 /* SUPPORT */
 /* ============================= */
 
-const support=
+const support =
 document.querySelector(".support");
 
+
 let scrollTimer;
+
 
 addEventListener("scroll",()=>{
 
@@ -935,7 +1218,9 @@ support.classList.add("scrolling");
 
 clearTimeout(scrollTimer);
 
-scrollTimer=setTimeout(()=>{
+
+scrollTimer =
+setTimeout(()=>{
 
 support.classList.remove("scrolling");
 
@@ -945,70 +1230,208 @@ support.classList.remove("scrolling");
 
 
 /* ============================= */
-/* AI ASSISTANT */
+/* AI ELEMENTS */
+/* ============================= */
+
+const aiOverlay =
+document.getElementById("aiOverlay");
+
+
+const aiPanel =
+document.querySelector(".ai-panel");
+
+
+const aiClose =
+document.getElementById("aiClose");
+
+
+const aiInput =
+document.getElementById("aiInput");
+
+
+const aiSend =
+document.getElementById("aiSend");
+
+
+const aiMessages =
+document.getElementById("aiMessages");
+
+
+/* ============================= */
+/* URL WORKER */
 /* ============================= */
 
 const AI_URL =
 "https://call-server-proxy.dmetro2484285.workers.dev";
 
 
-const aiInput =
-document.getElementById("aiInput");
-
-const aiSend =
-document.getElementById("aiSend");
-
-const aiMessages =
-document.getElementById("aiMessages");
-
-
-/* ================================= */
-/* ПАМЯТЬ ТЕКУЩЕГО ДИАЛОГА */
-/* ================================= */
+/* ============================= */
+/* ПАМЯТЬ ДИАЛОГА */
+/* ============================= */
 
 let chatHistory = [];
 
 
-/* ================================= */
-/* ДОБАВИТЬ СООБЩЕНИЕ НА ЭКРАН */
-/* ================================= */
+/* ============================= */
+/* ОТКРЫТЬ AI */
+/* ============================= */
+
+function openAI(){
+
+aiOverlay.classList.add("open");
+
+document.body.style.overflow="hidden";
+
+
+setTimeout(()=>{
+
+aiInput.focus();
+
+},450);
+
+}
+
+
+/* ============================= */
+/* ЗАКРЫТЬ AI */
+/* ============================= */
+
+function closeAI(){
+
+aiOverlay.classList.remove("open");
+
+document.body.style.overflow="";
+
+
+support.classList.remove("scrolling");
+
+}
+
+
+/* ============================= */
+/* SUPPORT → AI */
+/* ============================= */
+
+support.addEventListener(
+"click",
+event=>{
+
+event.preventDefault();
+
+if(aiOverlay.classList.contains("open")){
+
+closeAI();
+
+}else{
+
+openAI();
+
+}
+
+}
+);
+
+
+/* ============================= */
+/* КНОПКА ЗАКРЫТИЯ */
+/* ============================= */
+
+aiClose.addEventListener(
+"click",
+closeAI
+);
+
+
+/* ============================= */
+/* КЛИК ПО ФОНУ */
+/* ============================= */
+
+aiOverlay.addEventListener(
+"click",
+event=>{
+
+if(event.target === aiOverlay){
+
+closeAI();
+
+}
+
+}
+);
+
+
+/* ============================= */
+/* ESC → ЗАКРЫТЬ */
+/* ============================= */
+
+document.addEventListener(
+"keydown",
+event=>{
+
+if(
+event.key==="Escape" &&
+aiOverlay.classList.contains("open")
+){
+
+closeAI();
+
+}
+
+}
+);
+
+
+/* ============================= */
+/* ДОБАВИТЬ СООБЩЕНИЕ */
+/* ============================= */
 
 function addMessage(text,type){
 
-const message=
+const message =
 document.createElement("div");
 
-message.className=
+
+message.className =
 "ai-message " + type;
 
-message.textContent=text;
+
+message.textContent =
+text;
+
 
 aiMessages.appendChild(message);
 
-aiMessages.scrollTop=
+
+aiMessages.scrollTop =
 aiMessages.scrollHeight;
+
 
 return message;
 
 }
 
 
-/* ================================= */
+/* ============================= */
 /* ОТПРАВКА СООБЩЕНИЯ */
-/* ================================= */
+/* ============================= */
 
 async function sendAIMessage(){
 
-const message=
+const message =
 aiInput.value.trim();
 
 
-if(!message || aiSend.disabled){
+if(
+!message ||
+aiSend.disabled
+){
+
 return;
+
 }
 
 
-/* Показываем сообщение пользователя */
+/* Сообщение пользователя */
 
 addMessage(
 message,
@@ -1016,11 +1439,14 @@ message,
 );
 
 
-/* Сохраняем сообщение в память */
+/* Сохраняем */
 
 chatHistory.push({
+
 role:"user",
+
 content:message
+
 });
 
 
@@ -1039,21 +1465,22 @@ aiSend.textContent=
 "Думаю...";
 
 
-/* Показываем индикатор */
+/* Индикатор */
 
-const typing=
+const typing =
 addMessage(
 "AI Assistant печатает...",
 "typing"
 );
 
 
-/* Защита от зависания */
+/* Таймер */
 
-const controller=
+const controller =
 new AbortController();
 
-const timeout=
+
+const timeout =
 setTimeout(()=>{
 
 controller.abort();
@@ -1063,14 +1490,16 @@ controller.abort();
 
 try{
 
+
 /* ============================= */
-/* ОТПРАВКА НА WORKER */
+/* ОТПРАВКА НА CLOUDFLARE */
 /* ============================= */
 
-const response=
+const response =
 await fetch(
 AI_URL,
 {
+
 method:"POST",
 
 headers:{
@@ -1082,8 +1511,8 @@ body:JSON.stringify({
 
 message:message,
 
-history:chatHistory
-  .slice(-12)
+history:
+chatHistory.slice(-12)
 
 }),
 
@@ -1096,6 +1525,8 @@ signal:controller.signal
 clearTimeout(timeout);
 
 
+/* Проверяем ответ */
+
 if(!response.ok){
 
 throw new Error(
@@ -1106,11 +1537,11 @@ response.status
 }
 
 
-const data=
+const data =
 await response.json();
 
 
-/* Убираем индикатор */
+/* Убираем печать */
 
 typing.remove();
 
@@ -1127,7 +1558,7 @@ data.reply,
 );
 
 
-/* Сохраняем ответ AI */
+/* Сохраняем ответ */
 
 chatHistory.push({
 
@@ -1142,7 +1573,7 @@ content:data.reply
 
 if(chatHistory.length>12){
 
-chatHistory=
+chatHistory =
 chatHistory.slice(-12);
 
 }
@@ -1206,7 +1637,7 @@ aiInput.focus();
 
 
 /* ============================= */
-/* КНОПКА ОТПРАВИТЬ */
+/* ОТПРАВИТЬ */
 /* ============================= */
 
 aiSend.addEventListener(
@@ -1246,10 +1677,11 @@ aiInput.addEventListener(
 "input",
 ()=>{
 
-aiInput.style.height=
+aiInput.style.height =
 "auto";
 
-aiInput.style.height=
+
+aiInput.style.height =
 Math.min(
 aiInput.scrollHeight,
 130
@@ -1258,44 +1690,8 @@ aiInput.scrollHeight,
 }
 );
 
-
-/* ============================= */
-/* SUPPORT → AI ASSISTANT */
-/* ============================= */
-
-document
-.getElementById("supportButton")
-.addEventListener(
-"click",
-event=>{
-
-event.preventDefault();
-
-
-document
-.getElementById("ai-assistant")
-.scrollIntoView({
-
-behavior:"smooth",
-
-block:"start"
-
-});
-
-
-setTimeout(
-()=>{
-
-aiInput.focus();
-
-},
-700
-);
-
-}
-);
-
 </script>
+
 
 </body>
 </html>
