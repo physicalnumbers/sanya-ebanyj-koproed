@@ -6,7 +6,6 @@
 <title>Физические Номера</title>
 
 <style>
-
 *{
 box-sizing:border-box;
 margin:0
@@ -131,7 +130,7 @@ transform:translateY(-3px)
 }
 
 
-/* SUPPORT */
+/* Кнопка поддержки */
 
 .support{
 position:fixed;
@@ -186,8 +185,6 @@ display:block;
 object-fit:cover
 }
 
-
-/* СЕКЦИИ */
 
 .head{
 display:flex;
@@ -266,119 +263,174 @@ font-size:25px
 }
 
 
-/* AI */
+/* AI ASSISTANT */
 
-#ai{
+.ai-section{
+background:#0b0b0b;
+color:#fff;
 min-height:100vh;
-padding-top:120px;
-padding-bottom:120px;
-background:#f5f5f5
-}
-
-.ai-container{
-max-width:1000px;
-margin:0 auto
+padding:120px 7vw;
+border-bottom:0
 }
 
 .ai-head{
 display:flex;
 justify-content:space-between;
 align-items:flex-start;
-margin-bottom:50px
+margin-bottom:45px
+}
+
+.ai-number{
+color:#777;
+font-size:13px;
+letter-spacing:2px
+}
+
+.ai-title{
+font-size:clamp(38px,5vw,70px);
+font-weight:500;
+letter-spacing:-3px
+}
+
+.ai-subtitle{
+margin-top:18px;
+color:#777;
+font-size:15px;
+line-height:1.5
+}
+
+.ai-box{
+width:100%;
+max-width:1000px;
+margin:0 auto;
+background:#111;
+border:1px solid #292929;
+border-radius:2px;
+overflow:hidden;
+box-shadow:
+0 20px 70px rgba(0,0,0,.45)
+}
+
+.ai-top{
+height:64px;
+padding:0 24px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+border-bottom:1px solid #292929;
+background:#0f0f0f
+}
+
+.ai-name{
+font-size:16px;
+font-weight:600
 }
 
 .ai-status{
-color:#888;
-font-size:13px;
-letter-spacing:2px;
-text-transform:uppercase
+display:flex;
+align-items:center;
+gap:8px;
+color:#777;
+font-size:12px
 }
 
-.ai-chat{
-border:1px solid #ccc;
-background:#fff;
-min-height:550px;
-display:flex;
-flex-direction:column
+.ai-dot{
+width:7px;
+height:7px;
+border-radius:50%;
+background:#777
 }
 
 .ai-messages{
-flex:1;
-padding:30px;
+height:500px;
+padding:25px;
 overflow-y:auto;
-min-height:400px;
-max-height:500px
+display:flex;
+flex-direction:column;
+gap:15px
 }
 
 .ai-message{
-max-width:75%;
-padding:15px 18px;
-margin-bottom:15px;
+max-width:78%;
+padding:14px 17px;
+border-radius:3px;
 line-height:1.5;
-white-space:pre-wrap
-}
-
-.ai-message.bot{
-background:#f0f0f0;
-color:#111;
-margin-right:auto
+white-space:pre-wrap;
+word-break:break-word
 }
 
 .ai-message.user{
-background:#111;
-color:#fff;
-margin-left:auto
+align-self:flex-end;
+background:#fff;
+color:#111
+}
+
+.ai-message.bot{
+align-self:flex-start;
+background:#1c1c1c;
+color:#ddd;
+border:1px solid #292929
 }
 
 .ai-input-area{
-border-top:1px solid #ccc;
 display:flex;
+gap:10px;
 padding:15px;
-gap:10px
+border-top:1px solid #292929;
+background:#0f0f0f
 }
 
 .ai-input{
 flex:1;
 height:50px;
-border:1px solid #ccc;
+padding:0 16px;
+background:#171717;
+border:1px solid #303030;
 outline:none;
-padding:0 15px;
-font:14px Arial;
-background:#fff
+color:#fff;
+font:14px Arial
 }
 
 .ai-input:focus{
-border-color:#111
+border-color:#555
+}
+
+.ai-input::placeholder{
+color:#666
 }
 
 .ai-send{
-width:55px;
+width:110px;
 height:50px;
-border:1px solid #111;
-background:#111;
-color:#fff;
+border:0;
+background:#fff;
+color:#111;
 cursor:pointer;
-font-size:20px;
-transition:.25s
+font-weight:600;
+transition:.2s
 }
 
 .ai-send:hover{
-background:#fff;
-color:#111
+background:#ddd
 }
 
 .ai-send:disabled{
-opacity:.5;
+opacity:.45;
 cursor:not-allowed
 }
 
 .ai-loading{
-color:#888;
-font-style:italic
+color:#777 !important
 }
 
+.ai-info{
+max-width:1000px;
+margin:18px auto 0;
+color:#555;
+font-size:12px;
+line-height:1.5
+}
 
-/* FOOTER */
 
 footer{
 min-height:220px;
@@ -397,9 +449,6 @@ font-size:25px
 .copy{
 color:#888
 }
-
-
-/* АНИМАЦИИ */
 
 .reveal{
 opacity:0;
@@ -442,9 +491,6 @@ opacity:1;
 transform:none
 }
 }
-
-
-/* МОБИЛЬНАЯ ВЕРСИЯ */
 
 @media(max-width:800px){
 
@@ -507,18 +553,21 @@ align-items:flex-start;
 gap:30px
 }
 
-.ai-head{
-flex-direction:column;
-gap:20px
+.ai-section{
+padding:80px 25px
 }
 
-.ai-chat{
-min-height:500px
+.ai-head{
+display:block
+}
+
+.ai-title{
+margin-top:25px
 }
 
 .ai-messages{
-min-height:350px;
-padding:20px
+height:450px;
+padding:15px
 }
 
 .ai-message{
@@ -529,8 +578,11 @@ max-width:90%
 padding:10px
 }
 
+.ai-send{
+width:85px
 }
 
+}
 </style>
 </head>
 
@@ -545,7 +597,7 @@ padding:10px
 <nav>
 <a href="#about">О проекте</a>
 <a href="#services">Возможности</a>
-<a href="#contact">Контакты</a>
+<a href="#ai">AI Assistant</a>
 </nav>
 
 </header>
@@ -731,60 +783,58 @@ padding:10px
 </section>
 
 
-<section id="contact">
-
-<div class="head">
-
-<div class="num">
-03 / КОНТАКТЫ
-</div>
-
-<h2>
-Остались<br>
-вопросы?
-</h2>
-
-</div>
-
-<p class="desc">
-Здесь позже можно разместить контакты,
-Telegram или форму обратной связи.
-</p>
-
-</section>
-
-
 <!-- AI ASSISTANT -->
 
-<section id="ai">
-
-<div class="ai-container">
+<section id="ai" class="ai-section">
 
 <div class="ai-head">
 
-<div class="num">
-04 / AI ASSISTANT
+<div>
+
+<div class="ai-number">
+03 / AI ASSISTANT
+</div>
+
+<div class="ai-title">
+Поговорим?
+</div>
+
+<p class="ai-subtitle">
+AI Assistant работает прямо в браузере.<br>
+Без OpenAI API и без оплаты.
+</p>
+
+</div>
+
+</div>
+
+
+<div class="ai-box">
+
+<div class="ai-top">
+
+<div class="ai-name">
+AI Assistant
 </div>
 
 <div class="ai-status">
-Онлайн
-</div>
+
+<div class="ai-dot"></div>
+
+<span id="aiStatus">
+Загрузка модели...
+</span>
 
 </div>
 
-<h2>
-Чем могу<br>
-помочь?
-</h2>
+</div>
 
-<br><br>
 
-<div class="ai-chat">
-
-<div class="ai-messages" id="aiMessages">
+<div id="aiMessages" class="ai-messages">
 
 <div class="ai-message bot">
-Привет! Я AI Assistant. Напиши свой вопрос.
+Привет. Я AI Assistant.
+Сейчас загружаю модель, это может занять некоторое время при первом запуске.
 </div>
 
 </div>
@@ -796,22 +846,26 @@ Telegram или форму обратной связи.
 id="aiInput"
 class="ai-input"
 type="text"
-placeholder="Напишите сообщение..."
+placeholder="Напиши сообщение..."
 autocomplete="off"
+disabled
 >
 
 <button
 id="aiSend"
 class="ai-send"
-type="button"
+disabled
 >
-→
+Отправить
 </button>
 
 </div>
 
 </div>
 
+
+<div class="ai-info">
+Модель запускается локально в браузере. При первом запуске потребуется скачать её файлы.
 </div>
 
 </section>
@@ -832,21 +886,19 @@ type="button"
 </footer>
 
 
-<!-- SUPPORT -->
-
-<a class="support" href="#ai">
-
+<a class="support" href="#ai" id="supportButton">
 <img src="support.png" alt="SUPPORT">
-
 </a>
 
 
-<script>
+<script type="module">
 
-/* АНИМАЦИЯ ПОЯВЛЕНИЯ */
+/* =========================================
+   АНИМАЦИИ САЙТА
+========================================= */
 
 const elements=document.querySelectorAll(
-"#about .head,#about .info,#services .head,#services .cards,#contact .head,#contact .desc,#ai .ai-container,.card"
+"#about .head,#about .info,#services .head,#services .cards,#contact .head,#contact .desc,.card"
 );
 
 const observer=new IntersectionObserver(
@@ -869,7 +921,9 @@ observer.observe(element);
 });
 
 
-/* ПАРАЛЛАКС ЗАГОЛОВКА */
+/* =========================================
+   ПАРАЛЛАКС ЗАГОЛОВКА
+========================================= */
 
 addEventListener("scroll",()=>{
 
@@ -883,7 +937,9 @@ document.querySelector("h1").style.translate=
 });
 
 
-/* SUPPORT ПРИ СКРОЛЛЕ */
+/* =========================================
+   КНОПКА SUPPORT
+========================================= */
 
 const support=document.querySelector(".support");
 
@@ -904,132 +960,254 @@ support.classList.remove("scrolling");
 });
 
 
-/* AI CHAT */
+support.addEventListener("click",(event)=>{
 
-const WORKER_URL =
-"https://call-server-proxy.dmetro2484285.workers.dev/";
+event.preventDefault();
 
-const aiInput=document.getElementById("aiInput");
-const aiSend=document.getElementById("aiSend");
-const aiMessages=document.getElementById("aiMessages");
+document.querySelector("#ai").scrollIntoView({
+behavior:"smooth"
+});
 
+});
+
+
+/* =========================================
+   AI ASSISTANT
+   ЛОКАЛЬНАЯ МОДЕЛЬ
+========================================= */
+
+import {
+pipeline
+} from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.2";
+
+
+const messagesBox=document.getElementById("aiMessages");
+const input=document.getElementById("aiInput");
+const sendButton=document.getElementById("aiSend");
+const status=document.getElementById("aiStatus");
+
+let generator=null;
+let isGenerating=false;
+
+
+/* Добавление сообщения */
 
 function addMessage(text,type){
 
 const message=document.createElement("div");
 
 message.className=
-"ai-message " + type;
+"ai-message "+
+(type==="user" ? "user" : "bot");
 
 message.textContent=text;
 
-aiMessages.appendChild(message);
+messagesBox.appendChild(message);
 
-aiMessages.scrollTop=
-aiMessages.scrollHeight;
+messagesBox.scrollTop=
+messagesBox.scrollHeight;
 
 return message;
 
 }
 
 
+/* =========================================
+   ЗАГРУЗКА МОДЕЛИ
+========================================= */
+
+async function loadAI(){
+
+try{
+
+status.textContent="Загрузка модели...";
+
+generator=await pipeline(
+"text-generation",
+"onnx-community/SmolLM2-360M-ONNX",
+{
+dtype:"q4f16"
+}
+);
+
+status.textContent="Онлайн";
+
+input.disabled=false;
+sendButton.disabled=false;
+
+input.focus();
+
+addMessage(
+"Готово. Можешь писать мне сообщения.",
+"bot"
+);
+
+}catch(error){
+
+console.error(error);
+
+status.textContent="Ошибка загрузки";
+
+addMessage(
+"Не удалось загрузить AI Assistant. Проверь интернет-соединение и обнови страницу.",
+"bot"
+);
+
+}
+
+}
+
+
+/* =========================================
+   ОТПРАВКА
+========================================= */
+
 async function sendMessage(){
 
-const text=aiInput.value.trim();
+if(isGenerating){
+return;
+}
+
+const text=input.value.trim();
 
 if(!text){
 return;
 }
 
+if(!generator){
+return;
+}
+
+isGenerating=true;
+
+input.disabled=true;
+sendButton.disabled=true;
 
 addMessage(text,"user");
 
-aiInput.value="";
+input.value="";
 
-aiSend.disabled=true;
 
-const loading=
-addMessage("ИИ печатает...","bot");
+const loadingMessage=
+addMessage("Думаю...","bot");
 
-loading.classList.add("ai-loading");
+loadingMessage.classList.add("ai-loading");
 
 
 try{
 
-const response=await fetch(WORKER_URL,{
+const prompt=
+`You are AI Assistant on a website called "Физические Номера".
+Answer the user clearly and briefly.
+The user speaks Russian, so answer in Russian.
 
-method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-message:text
-})
-
-});
+User: ${text}
+Assistant:`;
 
 
-if(!response.ok){
-
-throw new Error(
-"Ошибка сервера: " + response.status
+const result=await generator(
+prompt,
+{
+max_new_tokens:160,
+temperature:0.7,
+do_sample:true
+}
 );
+
+
+let reply="";
+
+if(
+result &&
+result[0] &&
+result[0].generated_text
+){
+
+reply=result[0].generated_text;
 
 }
 
 
-const data=await response.json();
+/* Убираем исходный prompt из ответа */
 
-loading.remove();
+if(reply.startsWith(prompt)){
+
+reply=reply.slice(prompt.length);
+
+}
 
 
-addMessage(
-data.reply || "ИИ не вернул ответ.",
-"bot"
-);
+/* Чистим возможные служебные куски */
 
+reply=reply
+.replace(/^Assistant:\s*/i,"")
+.trim();
+
+
+if(!reply){
+
+reply="Я не смог сформировать ответ. Попробуй написать немного иначе.";
+
+}
+
+
+loadingMessage.textContent=reply;
+
+loadingMessage.classList.remove("ai-loading");
 
 }catch(error){
 
-loading.remove();
-
-addMessage(
-"Не удалось подключиться к AI Assistant.",
-"bot"
-);
-
 console.error(error);
 
-}
+loadingMessage.textContent=
+"Произошла ошибка при генерации ответа.";
 
-
-aiSend.disabled=false;
-
-aiInput.focus();
+loadingMessage.classList.remove("ai-loading");
 
 }
 
 
-aiSend.addEventListener(
+input.disabled=false;
+sendButton.disabled=false;
+
+isGenerating=false;
+
+input.focus();
+
+}
+
+
+/* =========================================
+   КНОПКИ
+========================================= */
+
+sendButton.addEventListener(
 "click",
 sendMessage
 );
 
 
-aiInput.addEventListener(
+input.addEventListener(
 "keydown",
 event=>{
 
 if(event.key==="Enter"){
 
+event.preventDefault();
+
 sendMessage();
 
 }
 
-});
+}
+);
 
+
+/* =========================================
+   ЗАПУСК AI
+========================================= */
+
+loadAI();
 
 </script>
 
