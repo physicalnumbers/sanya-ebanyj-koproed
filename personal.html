@@ -320,6 +320,22 @@ alt="Аватар"
 
 <div class="profile-form">
 
+
+<div class="field">
+
+<label for="avatarFile">
+Аватар
+</label>
+
+<input
+type="file"
+id="avatarFile"
+accept="image/png,image/jpeg,image/webp,image/gif"
+>
+
+</div>
+
+
 <div class="field">
 
 <label for="nickname">
@@ -399,7 +415,9 @@ getAuth,
 GoogleAuthProvider,
 signInWithPopup,
 onAuthStateChanged,
-signOut
+signOut,
+setPersistence,
+browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
 import {
@@ -412,7 +430,7 @@ setDoc
 
 const firebaseConfig = {
 
-apiKey: "AIzaSyBqGLonGIt2m_55dt1DWjzhLGnL7m6N0J4",
+apiKey: "AIzaSyBqGLonGIt2m_55dt1DWjzhLGn7m6N0J4",
 
 authDomain: "physical-numbers.firebaseapp.com",
 
@@ -422,7 +440,7 @@ storageBucket: "physical-numbers.firebasestorage.app",
 
 messagingSenderId: "1031207446971",
 
-appId: "1:1031207446971:web:ed03e122d4727f8e28fc9e",
+appId: "1:1031207446971:web:ed03e122d4727f8e28fc9",
 
 measurementId: "G-S8J83CEQWL"
 
@@ -455,6 +473,9 @@ document.getElementById("userEmail");
 
 const avatar =
 document.getElementById("avatar");
+
+const avatarFile =
+document.getElementById("avatarFile");
 
 const nickname =
 document.getElementById("nickname");
@@ -507,9 +528,36 @@ successMessage.style.display = "none";
 }
 
 
+/*
+Проверяем сохранение входа.
+Теперь Google-вход должен сохраняться
+между перезагрузками страницы.
+*/
+
+try{
+
+await setPersistence(
+auth,
+browserLocalPersistence
+);
+
+}
+catch(error){
+
+console.error(error);
+
+}
+
+
+/*
+Google-вход
+*/
+
 loginButton.addEventListener("click", async () => {
 
 hideError();
+
+hideSuccess();
 
 loginButton.disabled = true;
 
@@ -527,7 +575,9 @@ console.error(error);
 
 if(error.code === "auth/popup-closed-by-user"){
 
-showError("Окно входа было закрыто.");
+showError(
+"Окно входа было закрыто."
+);
 
 }
 else if(error.code === "auth/popup-blocked"){
@@ -555,6 +605,10 @@ loginButton.textContent = "Создать кабинет";
 });
 
 
+/*
+Загрузка существующего профиля
+*/
+
 async function loadProfile(user){
 
 try{
@@ -577,6 +631,19 @@ data.nickname || "";
 profileDescription.value =
 data.description || "";
 
+
+/*
+Если в Firestore уже есть
+аватарка — показываем её.
+*/
+
+if(data.avatarUrl){
+
+avatar.src =
+data.avatarUrl;
+
+}
+
 }
 
 }
@@ -594,9 +661,148 @@ error.code
 }
 
 
+/*
+Загрузка аватарки в Picrd
+*/
+
+async function uploadAvatar(file){
+
+if(!file){
+
+return null;
+
+}
+
+
+/*
+Максимум 10 МБ
+*/
+
+if(file.size > 10 * 1024 * 1024){
+
+throw new Error(
+"Размер аватарки не должен превышать 10 МБ."
+);
+
+}
+
+
+/*
+Проверяем тип файла
+*/
+
+const allowedTypes = [
+
+"image/png",
+"image/jpeg",
+"image/webp",
+"image/gif"
+
+];
+
+if(!allowedTypes.includes(file.type)){
+
+throw new Error(
+"Можно загружать только PNG, JPEG, WebP или GIF."
+);
+
+}
+
+
+const formData =
+new FormData();
+
+formData.append(
+"file",
+file
+);
+
+formData.append(
+"visibility",
+"public"
+);
+
+
+/*
+Без ttl_seconds =
+без установленного срока удаления.
+*/
+
+const response =
+await fetch(
+"https://picrd.com/api/upload",
+{
+method:"POST",
+body:formData
+}
+);
+
+
+if(!response.ok){
+
+throw new Error(
+"Picrd вернул ошибку HTTP " +
+response.status
+);
+
+}
+
+
+const result =
+await response.json();
+
+
+if(!result.image_url){
+
+throw new Error(
+"Picrd не вернул ссылку на изображение."
+);
+
+}
+
+
+return result.image_url;
+
+}
+
+
+/*
+Предпросмотр выбранной аватарки
+*/
+
+avatarFile.addEventListener(
+"change",
+() => {
+
+const file =
+avatarFile.files[0];
+
+if(!file){
+
+return;
+
+}
+
+
+const previewUrl =
+URL.createObjectURL(file);
+
+avatar.src =
+previewUrl;
+
+}
+);
+
+
+/*
+Сохранение профиля
+*/
+
 saveButton.addEventListener("click", async () => {
 
-const user = auth.currentUser;
+const user =
+auth.currentUser;
+
 
 if(!user){
 
@@ -612,6 +818,7 @@ return;
 hideError();
 
 hideSuccess();
+
 
 const nicknameValue =
 nickname.value.trim();
@@ -633,24 +840,78 @@ return;
 
 saveButton.disabled = true;
 
-saveButton.textContent = "Сохранение...";
+saveButton.textContent =
+"Сохранение...";
 
 
 try{
+
+let avatarUrl = null;
+
+
+/*
+Если пользователь выбрал
+новую аватарку — загружаем её.
+*/
+
+if(avatarFile.files.length > 0){
+
+saveButton.textContent =
+"Загрузка аватарки...";
+
+avatarUrl =
+await uploadAvatar(
+avatarFile.files[0]
+);
+
+}
+
+
+/*
+Сохраняем данные в Firestore.
+*/
+
+saveButton.textContent =
+"Сохранение...";
+
 
 const userRef =
 doc(db,"users",user.uid);
 
 
+const profileData = {
+
+nickname: nicknameValue,
+
+description: descriptionValue,
+
+email: user.email || "",
+
+googleName: user.displayName || "",
+
+updatedAt:
+new Date().toISOString()
+
+};
+
+
+/*
+Записываем avatarUrl
+только если пользователь
+выбрал новую картинку.
+*/
+
+if(avatarUrl){
+
+profileData.avatarUrl =
+avatarUrl;
+
+}
+
+
 await setDoc(
 userRef,
-{
-nickname: nicknameValue,
-description: descriptionValue,
-email: user.email || "",
-googleName: user.displayName || "",
-updatedAt: new Date().toISOString()
-},
+profileData,
 {
 merge:true
 }
@@ -661,14 +922,22 @@ showSuccess(
 "Профиль сохранён."
 );
 
+
+/*
+После загрузки очищаем
+выбранный файл.
+*/
+
+avatarFile.value = "";
+
 }
 catch(error){
 
 console.error(error);
 
 showError(
-"Не удалось сохранить профиль. Код ошибки: " +
-error.code
+error.message ||
+"Не удалось сохранить профиль."
 );
 
 }
@@ -681,6 +950,10 @@ saveButton.textContent =
 
 });
 
+
+/*
+Выход
+*/
 
 logoutButton.addEventListener("click", async () => {
 
@@ -702,7 +975,13 @@ showError(
 });
 
 
-onAuthStateChanged(auth, async (user) => {
+/*
+Отслеживаем состояние аккаунта
+*/
+
+onAuthStateChanged(
+auth,
+async (user) => {
 
 hideError();
 
@@ -714,21 +993,35 @@ if(user){
 description.textContent =
 "Настройте информацию своего профиля.";
 
-loginButton.style.display = "none";
+loginButton.style.display =
+"none";
 
 accountCard.classList.add("active");
 
 
 googleName.textContent =
-user.displayName || "Пользователь";
+user.displayName ||
+"Пользователь";
 
 userEmail.textContent =
 user.email || "";
 
 
+/*
+Пока у пользователя нет
+нашей аватарки, показываем
+Google-аватар.
+*/
+
 if(user.photoURL){
 
-avatar.src = user.photoURL;
+avatar.src =
+user.photoURL;
+
+}
+else{
+
+avatar.src = "";
 
 }
 
@@ -749,6 +1042,10 @@ accountCard.classList.remove("active");
 nickname.value = "";
 
 profileDescription.value = "";
+
+avatarFile.value = "";
+
+avatar.src = "";
 
 }
 
