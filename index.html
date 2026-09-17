@@ -6,6 +6,7 @@
 <title>Физические Номера</title>
 
 <style>
+
 *{
 box-sizing:border-box;
 margin:0
@@ -130,7 +131,7 @@ transform:translateY(-3px)
 }
 
 
-/* Кнопка поддержки */
+/* SUPPORT */
 
 .support{
 position:fixed;
@@ -185,6 +186,8 @@ display:block;
 object-fit:cover
 }
 
+
+/* СЕКЦИИ */
 
 .head{
 display:flex;
@@ -262,6 +265,121 @@ align-self:flex-end;
 font-size:25px
 }
 
+
+/* AI */
+
+#ai{
+min-height:100vh;
+padding-top:120px;
+padding-bottom:120px;
+background:#f5f5f5
+}
+
+.ai-container{
+max-width:1000px;
+margin:0 auto
+}
+
+.ai-head{
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+margin-bottom:50px
+}
+
+.ai-status{
+color:#888;
+font-size:13px;
+letter-spacing:2px;
+text-transform:uppercase
+}
+
+.ai-chat{
+border:1px solid #ccc;
+background:#fff;
+min-height:550px;
+display:flex;
+flex-direction:column
+}
+
+.ai-messages{
+flex:1;
+padding:30px;
+overflow-y:auto;
+min-height:400px;
+max-height:500px
+}
+
+.ai-message{
+max-width:75%;
+padding:15px 18px;
+margin-bottom:15px;
+line-height:1.5;
+white-space:pre-wrap
+}
+
+.ai-message.bot{
+background:#f0f0f0;
+color:#111;
+margin-right:auto
+}
+
+.ai-message.user{
+background:#111;
+color:#fff;
+margin-left:auto
+}
+
+.ai-input-area{
+border-top:1px solid #ccc;
+display:flex;
+padding:15px;
+gap:10px
+}
+
+.ai-input{
+flex:1;
+height:50px;
+border:1px solid #ccc;
+outline:none;
+padding:0 15px;
+font:14px Arial;
+background:#fff
+}
+
+.ai-input:focus{
+border-color:#111
+}
+
+.ai-send{
+width:55px;
+height:50px;
+border:1px solid #111;
+background:#111;
+color:#fff;
+cursor:pointer;
+font-size:20px;
+transition:.25s
+}
+
+.ai-send:hover{
+background:#fff;
+color:#111
+}
+
+.ai-send:disabled{
+opacity:.5;
+cursor:not-allowed
+}
+
+.ai-loading{
+color:#888;
+font-style:italic
+}
+
+
+/* FOOTER */
+
 footer{
 min-height:220px;
 padding:45px 7vw;
@@ -279,6 +397,9 @@ font-size:25px
 .copy{
 color:#888
 }
+
+
+/* АНИМАЦИИ */
 
 .reveal{
 opacity:0;
@@ -323,153 +444,7 @@ transform:none
 }
 
 
-/* =========================
-   AI-АССИСТЕНТ
-========================= */
-
-.ai-open{
-position:fixed;
-right:25px;
-bottom:130px;
-z-index:10000;
-width:58px;
-height:58px;
-border:1px solid #111;
-border-radius:50%;
-background:#111;
-color:#fff;
-font-size:13px;
-cursor:pointer;
-transition:.25s;
-box-shadow:0 8px 30px rgba(0,0,0,.15)
-}
-
-.ai-open:hover{
-background:#fff;
-color:#111;
-transform:translateY(-3px)
-}
-
-.ai-chat{
-position:fixed;
-right:25px;
-bottom:130px;
-z-index:10001;
-width:360px;
-height:500px;
-background:#f5f5f5;
-border:1px solid #ccc;
-box-shadow:0 20px 60px rgba(0,0,0,.18);
-display:none;
-flex-direction:column;
-overflow:hidden
-}
-
-.ai-chat.active{
-display:flex
-}
-
-.ai-header{
-height:58px;
-padding:0 18px;
-display:flex;
-align-items:center;
-justify-content:space-between;
-border-bottom:1px solid #ccc;
-background:#f5f5f5
-}
-
-.ai-header span{
-font-size:15px;
-font-weight:600
-}
-
-.ai-header button{
-border:0;
-background:none;
-font-size:27px;
-line-height:1;
-cursor:pointer;
-color:#555
-}
-
-.ai-header button:hover{
-color:#000
-}
-
-.ai-messages{
-flex:1;
-padding:18px;
-overflow-y:auto;
-display:flex;
-flex-direction:column;
-gap:12px
-}
-
-.ai-message{
-max-width:85%;
-padding:12px 14px;
-line-height:1.5;
-font-size:14px;
-word-wrap:break-word
-}
-
-.ai-bot{
-align-self:flex-start;
-background:#e9e9e9;
-color:#111
-}
-
-.ai-user{
-align-self:flex-end;
-background:#111;
-color:#fff
-}
-
-.ai-loading{
-align-self:flex-start;
-background:#e9e9e9;
-color:#888
-}
-
-.ai-form{
-height:64px;
-display:flex;
-border-top:1px solid #ccc;
-background:#f5f5f5
-}
-
-.ai-form input{
-flex:1;
-min-width:0;
-border:0;
-outline:0;
-padding:0 15px;
-background:transparent;
-font:14px Arial;
-color:#111
-}
-
-.ai-form button{
-width:64px;
-border:0;
-border-left:1px solid #ccc;
-background:#111;
-color:#fff;
-font-size:20px;
-cursor:pointer;
-transition:.2s
-}
-
-.ai-form button:hover{
-background:#333
-}
-
-.ai-form button:disabled{
-opacity:.5;
-cursor:default
-}
-
+/* МОБИЛЬНАЯ ВЕРСИЯ */
 
 @media(max-width:800px){
 
@@ -532,23 +507,30 @@ align-items:flex-start;
 gap:30px
 }
 
-
-/* AI на телефоне */
-
-.ai-open{
-right:15px;
-bottom:110px
+.ai-head{
+flex-direction:column;
+gap:20px
 }
 
 .ai-chat{
-right:15px;
-left:15px;
-bottom:105px;
-width:auto;
-height:70vh
+min-height:500px
+}
+
+.ai-messages{
+min-height:350px;
+padding:20px
+}
+
+.ai-message{
+max-width:90%
+}
+
+.ai-input-area{
+padding:10px
 }
 
 }
+
 </style>
 </head>
 
@@ -771,6 +753,69 @@ Telegram или форму обратной связи.
 
 </section>
 
+
+<!-- AI ASSISTANT -->
+
+<section id="ai">
+
+<div class="ai-container">
+
+<div class="ai-head">
+
+<div class="num">
+04 / AI ASSISTANT
+</div>
+
+<div class="ai-status">
+Онлайн
+</div>
+
+</div>
+
+<h2>
+Чем могу<br>
+помочь?
+</h2>
+
+<br><br>
+
+<div class="ai-chat">
+
+<div class="ai-messages" id="aiMessages">
+
+<div class="ai-message bot">
+Привет! Я AI Assistant. Напиши свой вопрос.
+</div>
+
+</div>
+
+
+<div class="ai-input-area">
+
+<input
+id="aiInput"
+class="ai-input"
+type="text"
+placeholder="Напишите сообщение..."
+autocomplete="off"
+>
+
+<button
+id="aiSend"
+class="ai-send"
+type="button"
+>
+→
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
 </main>
 
 
@@ -787,72 +832,21 @@ Telegram или форму обратной связи.
 </footer>
 
 
-<a class="support" href="#contact">
+<!-- SUPPORT -->
+
+<a class="support" href="#ai">
+
 <img src="support.png" alt="SUPPORT">
+
 </a>
-
-
-<!-- AI-АССИСТЕНТ -->
-
-<div class="ai-chat" id="aiChat">
-
-<div class="ai-header">
-
-<span>
-AI Ассистент
-</span>
-
-<button type="button" id="aiClose">
-×
-</button>
-
-</div>
-
-
-<div class="ai-messages" id="aiMessages">
-
-<div class="ai-message ai-bot">
-Привет. Я AI-ассистент «Физических Номеров». Чем могу помочь?
-</div>
-
-</div>
-
-
-<form class="ai-form" id="aiForm">
-
-<input
-type="text"
-id="aiInput"
-placeholder="Напиши сообщение..."
-autocomplete="off"
->
-
-<button type="submit" id="aiSend">
-→
-</button>
-
-</form>
-
-</div>
-
-
-<button
-class="ai-open"
-id="aiOpen"
-type="button"
->
-AI
-</button>
 
 
 <script>
 
-/* =========================
-   АНИМАЦИИ
-========================= */
+/* АНИМАЦИЯ ПОЯВЛЕНИЯ */
 
 const elements=document.querySelectorAll(
-"#about .head,#about .info,#services .head,#services .cards,#contact .head,#contact .desc,.card"
+"#about .head,#about .info,#services .head,#services .cards,#contact .head,#contact .desc,#ai .ai-container,.card"
 );
 
 const observer=new IntersectionObserver(
@@ -875,9 +869,7 @@ observer.observe(element);
 });
 
 
-/* =========================
-   ПАРАЛЛАКС ЗАГОЛОВКА
-========================= */
+/* ПАРАЛЛАКС ЗАГОЛОВКА */
 
 addEventListener("scroll",()=>{
 
@@ -891,9 +883,7 @@ document.querySelector("h1").style.translate=
 });
 
 
-/* =========================
-   КНОПКА ПОДДЕРЖКИ
-========================= */
+/* SUPPORT ПРИ СКРОЛЛЕ */
 
 const support=document.querySelector(".support");
 
@@ -914,63 +904,22 @@ support.classList.remove("scrolling");
 });
 
 
-/* =========================
-   AI-АССИСТЕНТ
-========================= */
+/* AI CHAT */
 
-const aiChat=document.getElementById("aiChat");
-const aiOpen=document.getElementById("aiOpen");
-const aiClose=document.getElementById("aiClose");
+const WORKER_URL =
+"https://call-server-proxy.dmetro2484285.workers.dev/";
 
-const aiForm=document.getElementById("aiForm");
 const aiInput=document.getElementById("aiInput");
 const aiSend=document.getElementById("aiSend");
 const aiMessages=document.getElementById("aiMessages");
 
 
-/*
-   Адрес твоего Cloudflare Worker
-*/
-
-const AI_WORKER_URL=
-"https://call-server-proxy.dmetro2484285.workers.dev/chat";
-
-
-/* Открытие окна */
-
-aiOpen.addEventListener("click",()=>{
-
-aiChat.classList.add("active");
-
-aiOpen.style.display="none";
-
-setTimeout(()=>{
-aiInput.focus();
-},100);
-
-});
-
-
-/* Закрытие окна */
-
-aiClose.addEventListener("click",()=>{
-
-aiChat.classList.remove("active");
-
-aiOpen.style.display="block";
-
-});
-
-
-/* Добавление сообщения */
-
-function addAIMessage(text,type){
+function addMessage(text,type){
 
 const message=document.createElement("div");
 
 message.className=
-"ai-message "+
-(type==="user" ? "ai-user" : "ai-bot");
+"ai-message " + type;
 
 message.textContent=text;
 
@@ -979,73 +928,35 @@ aiMessages.appendChild(message);
 aiMessages.scrollTop=
 aiMessages.scrollHeight;
 
-}
-
-
-/* Индикатор загрузки */
-
-function addAILoading(){
-
-const loading=document.createElement("div");
-
-loading.className=
-"ai-message ai-loading";
-
-loading.id="aiLoading";
-
-loading.textContent=
-"Печатает...";
-
-aiMessages.appendChild(loading);
-
-aiMessages.scrollTop=
-aiMessages.scrollHeight;
+return message;
 
 }
 
 
-function removeAILoading(){
+async function sendMessage(){
 
-const loading=
-document.getElementById("aiLoading");
+const text=aiInput.value.trim();
 
-if(loading){
-loading.remove();
-}
-
-}
-
-
-/* Отправка сообщения */
-
-aiForm.addEventListener("submit",async(event)=>{
-
-event.preventDefault();
-
-const message=
-aiInput.value.trim();
-
-if(!message){
+if(!text){
 return;
 }
 
 
-/* Показываем сообщение пользователя */
-
-addAIMessage(message,"user");
+addMessage(text,"user");
 
 aiInput.value="";
 
-aiInput.disabled=true;
 aiSend.disabled=true;
 
-addAILoading();
+const loading=
+addMessage("ИИ печатает...","bot");
+
+loading.classList.add("ai-loading");
 
 
 try{
 
-const response=
-await fetch(AI_WORKER_URL,{
+const response=await fetch(WORKER_URL,{
 
 method:"POST",
 
@@ -1054,56 +965,68 @@ headers:{
 },
 
 body:JSON.stringify({
-message:message
+message:text
 })
 
 });
 
 
-const data=
-await response.json();
-
-removeAILoading();
-
-
 if(!response.ok){
 
 throw new Error(
-data.error ||
-"Ошибка сервера"
+"Ошибка сервера: " + response.status
 );
 
 }
 
 
-addAIMessage(
-data.answer ||
-"Не удалось получить ответ.",
+const data=await response.json();
+
+loading.remove();
+
+
+addMessage(
+data.reply || "ИИ не вернул ответ.",
 "bot"
 );
 
 
 }catch(error){
 
-removeAILoading();
+loading.remove();
 
-console.error(
-"Ошибка AI:",
-error
-);
-
-addAIMessage(
-"Не удалось связаться с AI-ассистентом. Попробуй ещё раз.",
+addMessage(
+"Не удалось подключиться к AI Assistant.",
 "bot"
 );
+
+console.error(error);
 
 }
 
 
-aiInput.disabled=false;
 aiSend.disabled=false;
 
 aiInput.focus();
+
+}
+
+
+aiSend.addEventListener(
+"click",
+sendMessage
+);
+
+
+aiInput.addEventListener(
+"keydown",
+event=>{
+
+if(event.key==="Enter"){
+
+sendMessage();
+
+}
 
 });
 
