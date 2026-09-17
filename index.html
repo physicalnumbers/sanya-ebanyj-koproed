@@ -132,7 +132,7 @@ transform:translateY(-3px)
 
 
 /* ============================= */
-/* КНОПКА SUPPORT */
+/* SUPPORT */
 /* ============================= */
 
 .support{
@@ -277,7 +277,7 @@ font-size:25px
 
 
 /* ============================= */
-/* AI ASSISTANT — ВЫЕЗЖАЮЩЕЕ ОКНО */
+/* AI ASSISTANT */
 /* ============================= */
 
 .ai-overlay{
@@ -332,7 +332,7 @@ transform:translate(-50%,0)
 }
 
 
-/* Верхняя часть */
+/* Верх */
 
 .ai-top{
 height:85px;
@@ -368,7 +368,7 @@ letter-spacing:-1px
 }
 
 
-/* Кнопка закрытия */
+/* Закрытие */
 
 .ai-close{
 width:44px;
@@ -426,34 +426,98 @@ word-break:break-word
 
 .ai-message.user{
 align-self:flex-end;
-
 background:#111;
 color:#fff
 }
 
 .ai-message.assistant{
 align-self:flex-start;
-
 background:#e9e9e9;
 color:#111
 }
 
 .ai-message.error{
 align-self:flex-start;
-
 background:#eee;
 color:#555
 }
 
 .ai-message.typing{
 align-self:flex-start;
-
 background:#e9e9e9;
 color:#888
 }
 
 
-/* Поле ввода */
+/* ============================= */
+/* TELEGRAM SUPPORT */
+/* ============================= */
+
+.telegram-support{
+padding:18px 28px;
+
+border-top:1px solid #ccc;
+
+background:#f5f5f5;
+
+display:flex;
+align-items:center;
+justify-content:space-between;
+
+gap:20px
+}
+
+.telegram-text{
+color:#666;
+font-size:13px;
+line-height:1.5
+}
+
+.telegram-text strong{
+display:block;
+
+color:#111;
+
+font-size:15px;
+
+font-weight:500;
+
+margin-bottom:3px
+}
+
+.telegram-button{
+height:46px;
+
+padding:0 22px;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+background:#111;
+color:#fff;
+
+border:1px solid #111;
+
+text-decoration:none;
+
+font:14px Arial;
+
+white-space:nowrap;
+
+transition:.25s
+}
+
+.telegram-button:hover{
+background:transparent;
+color:#111;
+transform:translateY(-2px)
+}
+
+
+/* ============================= */
+/* INPUT */
+/* ============================= */
 
 .ai-input-area{
 border-top:1px solid #ccc;
@@ -461,6 +525,7 @@ border-top:1px solid #ccc;
 padding:18px;
 
 display:flex;
+
 gap:12px;
 
 background:#fff
@@ -482,15 +547,13 @@ padding:15px;
 font:14px Arial;
 
 color:#111;
+
 background:#f8f8f8
 }
 
 .ai-input:focus{
 border-color:#999
 }
-
-
-/* Кнопка отправки */
 
 .ai-send{
 width:130px;
@@ -674,7 +737,7 @@ gap:30px
 }
 
 
-/* AI на телефоне */
+/* AI */
 
 .ai-panel{
 width:100%;
@@ -708,6 +771,26 @@ padding:20px
 .ai-message{
 max-width:90%
 }
+
+
+/* Telegram */
+
+.telegram-support{
+padding:15px 18px;
+
+flex-direction:column;
+
+align-items:stretch;
+
+gap:12px
+}
+
+.telegram-button{
+width:100%
+}
+
+
+/* Input */
 
 .ai-input-area{
 padding:12px
@@ -760,7 +843,7 @@ padding-bottom:10px
 
 
 <!-- ============================= -->
-<!-- ОСНОВНОЙ САЙТ -->
+<!-- MAIN -->
 <!-- ============================= -->
 
 <main>
@@ -1033,7 +1116,7 @@ Telegram или форму обратной связи.
 
 
 <!-- ============================= -->
-<!-- AI ASSISTANT -->
+<!-- AI / SUPPORT WINDOW -->
 <!-- ============================= -->
 
 <div
@@ -1089,7 +1172,39 @@ id="aiMessages"
 </div>
 
 
-<!-- Поле ввода -->
+<!-- ============================= -->
+<!-- TELEGRAM SUPPORT -->
+<!-- ============================= -->
+
+<div class="telegram-support">
+
+<div class="telegram-text">
+
+<strong>
+Нужна помощь лично от поддержки?
+</strong>
+
+Если AI Assistant не смог помочь,
+напишите нам в Telegram.
+
+</div>
+
+
+<a
+class="telegram-button"
+href="https://t.me/physicalnumbers_support_bot"
+target="_blank"
+rel="noopener noreferrer"
+>
+Написать в Telegram
+</a>
+
+</div>
+
+
+<!-- ============================= -->
+<!-- INPUT -->
+<!-- ============================= -->
 
 <div class="ai-input-area">
 
@@ -1122,14 +1237,14 @@ Enter — отправить · Shift + Enter — новая строка
 
 
 <!-- ============================= -->
-<!-- SUPPORT -->
+<!-- SUPPORT BUTTON -->
 <!-- ============================= -->
 
 <a
 class="support"
 href="#"
 id="supportButton"
-aria-label="Открыть AI Assistant"
+aria-label="Открыть поддержку"
 >
 
 <img
@@ -1202,7 +1317,7 @@ document.querySelector("h1").style.translate =
 
 
 /* ============================= */
-/* SUPPORT */
+/* SUPPORT BUTTON */
 /* ============================= */
 
 const support =
@@ -1217,7 +1332,6 @@ addEventListener("scroll",()=>{
 support.classList.add("scrolling");
 
 clearTimeout(scrollTimer);
-
 
 scrollTimer =
 setTimeout(()=>{
@@ -1237,10 +1351,6 @@ const aiOverlay =
 document.getElementById("aiOverlay");
 
 
-const aiPanel =
-document.querySelector(".ai-panel");
-
-
 const aiClose =
 document.getElementById("aiClose");
 
@@ -1258,7 +1368,7 @@ document.getElementById("aiMessages");
 
 
 /* ============================= */
-/* URL WORKER */
+/* CLOUDFLARE WORKER */
 /* ============================= */
 
 const AI_URL =
@@ -1273,7 +1383,7 @@ let chatHistory = [];
 
 
 /* ============================= */
-/* ОТКРЫТЬ AI */
+/* ОТКРЫТЬ SUPPORT */
 /* ============================= */
 
 function openAI(){
@@ -1293,7 +1403,7 @@ aiInput.focus();
 
 
 /* ============================= */
-/* ЗАКРЫТЬ AI */
+/* ЗАКРЫТЬ SUPPORT */
 /* ============================= */
 
 function closeAI(){
@@ -1302,14 +1412,13 @@ aiOverlay.classList.remove("open");
 
 document.body.style.overflow="";
 
-
 support.classList.remove("scrolling");
 
 }
 
 
 /* ============================= */
-/* SUPPORT → AI */
+/* SUPPORT → ОКНО */
 /* ============================= */
 
 support.addEventListener(
@@ -1318,7 +1427,10 @@ event=>{
 
 event.preventDefault();
 
-if(aiOverlay.classList.contains("open")){
+
+if(
+aiOverlay.classList.contains("open")
+){
 
 closeAI();
 
@@ -1333,7 +1445,7 @@ openAI();
 
 
 /* ============================= */
-/* КНОПКА ЗАКРЫТИЯ */
+/* ЗАКРЫТИЕ */
 /* ============================= */
 
 aiClose.addEventListener(
@@ -1350,7 +1462,9 @@ aiOverlay.addEventListener(
 "click",
 event=>{
 
-if(event.target === aiOverlay){
+if(
+event.target === aiOverlay
+){
 
 closeAI();
 
@@ -1361,7 +1475,7 @@ closeAI();
 
 
 /* ============================= */
-/* ESC → ЗАКРЫТЬ */
+/* ESC */
 /* ============================= */
 
 document.addEventListener(
@@ -1385,7 +1499,10 @@ closeAI();
 /* ДОБАВИТЬ СООБЩЕНИЕ */
 /* ============================= */
 
-function addMessage(text,type){
+function addMessage(
+text,
+type
+){
 
 const message =
 document.createElement("div");
@@ -1399,7 +1516,9 @@ message.textContent =
 text;
 
 
-aiMessages.appendChild(message);
+aiMessages.appendChild(
+message
+);
 
 
 aiMessages.scrollTop =
@@ -1412,7 +1531,7 @@ return message;
 
 
 /* ============================= */
-/* ОТПРАВКА СООБЩЕНИЯ */
+/* AI MESSAGE */
 /* ============================= */
 
 async function sendAIMessage(){
@@ -1431,7 +1550,7 @@ return;
 }
 
 
-/* Сообщение пользователя */
+/* Показываем сообщение */
 
 addMessage(
 message,
@@ -1450,18 +1569,18 @@ content:message
 });
 
 
-/* Очищаем поле */
+/* Очищаем */
 
 aiInput.value="";
 
 aiInput.style.height="52px";
 
 
-/* Блокируем кнопку */
+/* Блокируем */
 
 aiSend.disabled=true;
 
-aiSend.textContent=
+aiSend.textContent =
 "Думаю...";
 
 
@@ -1481,18 +1600,21 @@ new AbortController();
 
 
 const timeout =
-setTimeout(()=>{
+setTimeout(
+()=>{
 
 controller.abort();
 
-},30000);
+},
+30000
+);
 
 
 try{
 
 
 /* ============================= */
-/* ОТПРАВКА НА CLOUDFLARE */
+/* ЗАПРОС К WORKER */
 /* ============================= */
 
 const response =
@@ -1525,8 +1647,6 @@ signal:controller.signal
 clearTimeout(timeout);
 
 
-/* Проверяем ответ */
-
 if(!response.ok){
 
 throw new Error(
@@ -1540,8 +1660,6 @@ response.status
 const data =
 await response.json();
 
-
-/* Убираем печать */
 
 typing.remove();
 
@@ -1558,8 +1676,6 @@ data.reply,
 );
 
 
-/* Сохраняем ответ */
-
 chatHistory.push({
 
 role:"assistant",
@@ -1569,9 +1685,9 @@ content:data.reply
 });
 
 
-/* Ограничиваем память */
-
-if(chatHistory.length>12){
+if(
+chatHistory.length > 12
+){
 
 chatHistory =
 chatHistory.slice(-12);
@@ -1604,7 +1720,9 @@ clearTimeout(timeout);
 typing.remove();
 
 
-if(error.name==="AbortError"){
+if(
+error.name === "AbortError"
+){
 
 addMessage(
 "AI Assistant слишком долго отвечает. Попробуйте ещё раз.",
@@ -1626,7 +1744,7 @@ console.error(error);
 
 aiSend.disabled=false;
 
-aiSend.textContent=
+aiSend.textContent =
 "Отправить";
 
 aiInput.focus();
@@ -1637,7 +1755,7 @@ aiInput.focus();
 
 
 /* ============================= */
-/* ОТПРАВИТЬ */
+/* ОТПРАВКА */
 /* ============================= */
 
 aiSend.addEventListener(
@@ -1655,7 +1773,7 @@ aiInput.addEventListener(
 event=>{
 
 if(
-event.key==="Enter" &&
+event.key === "Enter" &&
 !event.shiftKey
 ){
 
@@ -1670,7 +1788,7 @@ sendAIMessage();
 
 
 /* ============================= */
-/* АВТОРАЗМЕР TEXTAREA */
+/* АВТОРАЗМЕР */
 /* ============================= */
 
 aiInput.addEventListener(
@@ -1685,7 +1803,7 @@ aiInput.style.height =
 Math.min(
 aiInput.scrollHeight,
 130
-)+"px";
+) + "px";
 
 }
 );
