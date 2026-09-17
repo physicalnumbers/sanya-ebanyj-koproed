@@ -168,9 +168,6 @@ box-shadow:
 0 0 80px rgba(100,100,100,.1)
 }
 
-
-/* Кнопка во время скролла */
-
 .support.scrolling{
 transform:scale(.75);
 opacity:.45;
@@ -325,6 +322,155 @@ transform:none
 }
 }
 
+
+/* =========================
+   AI-АССИСТЕНТ
+========================= */
+
+.ai-open{
+position:fixed;
+right:25px;
+bottom:130px;
+z-index:10000;
+width:58px;
+height:58px;
+border:1px solid #111;
+border-radius:50%;
+background:#111;
+color:#fff;
+font-size:13px;
+cursor:pointer;
+transition:.25s;
+box-shadow:0 8px 30px rgba(0,0,0,.15)
+}
+
+.ai-open:hover{
+background:#fff;
+color:#111;
+transform:translateY(-3px)
+}
+
+.ai-chat{
+position:fixed;
+right:25px;
+bottom:130px;
+z-index:10001;
+width:360px;
+height:500px;
+background:#f5f5f5;
+border:1px solid #ccc;
+box-shadow:0 20px 60px rgba(0,0,0,.18);
+display:none;
+flex-direction:column;
+overflow:hidden
+}
+
+.ai-chat.active{
+display:flex
+}
+
+.ai-header{
+height:58px;
+padding:0 18px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+border-bottom:1px solid #ccc;
+background:#f5f5f5
+}
+
+.ai-header span{
+font-size:15px;
+font-weight:600
+}
+
+.ai-header button{
+border:0;
+background:none;
+font-size:27px;
+line-height:1;
+cursor:pointer;
+color:#555
+}
+
+.ai-header button:hover{
+color:#000
+}
+
+.ai-messages{
+flex:1;
+padding:18px;
+overflow-y:auto;
+display:flex;
+flex-direction:column;
+gap:12px
+}
+
+.ai-message{
+max-width:85%;
+padding:12px 14px;
+line-height:1.5;
+font-size:14px;
+word-wrap:break-word
+}
+
+.ai-bot{
+align-self:flex-start;
+background:#e9e9e9;
+color:#111
+}
+
+.ai-user{
+align-self:flex-end;
+background:#111;
+color:#fff
+}
+
+.ai-loading{
+align-self:flex-start;
+background:#e9e9e9;
+color:#888
+}
+
+.ai-form{
+height:64px;
+display:flex;
+border-top:1px solid #ccc;
+background:#f5f5f5
+}
+
+.ai-form input{
+flex:1;
+min-width:0;
+border:0;
+outline:0;
+padding:0 15px;
+background:transparent;
+font:14px Arial;
+color:#111
+}
+
+.ai-form button{
+width:64px;
+border:0;
+border-left:1px solid #ccc;
+background:#111;
+color:#fff;
+font-size:20px;
+cursor:pointer;
+transition:.2s
+}
+
+.ai-form button:hover{
+background:#333
+}
+
+.ai-form button:disabled{
+opacity:.5;
+cursor:default
+}
+
+
 @media(max-width:800px){
 
 header{
@@ -384,6 +530,22 @@ padding:35px 25px;
 flex-direction:column;
 align-items:flex-start;
 gap:30px
+}
+
+
+/* AI на телефоне */
+
+.ai-open{
+right:15px;
+bottom:110px
+}
+
+.ai-chat{
+right:15px;
+left:15px;
+bottom:105px;
+width:auto;
+height:70vh
 }
 
 }
@@ -630,7 +792,64 @@ Telegram или форму обратной связи.
 </a>
 
 
+<!-- AI-АССИСТЕНТ -->
+
+<div class="ai-chat" id="aiChat">
+
+<div class="ai-header">
+
+<span>
+AI Ассистент
+</span>
+
+<button type="button" id="aiClose">
+×
+</button>
+
+</div>
+
+
+<div class="ai-messages" id="aiMessages">
+
+<div class="ai-message ai-bot">
+Привет. Я AI-ассистент «Физических Номеров». Чем могу помочь?
+</div>
+
+</div>
+
+
+<form class="ai-form" id="aiForm">
+
+<input
+type="text"
+id="aiInput"
+placeholder="Напиши сообщение..."
+autocomplete="off"
+>
+
+<button type="submit" id="aiSend">
+→
+</button>
+
+</form>
+
+</div>
+
+
+<button
+class="ai-open"
+id="aiOpen"
+type="button"
+>
+AI
+</button>
+
+
 <script>
+
+/* =========================
+   АНИМАЦИИ
+========================= */
 
 const elements=document.querySelectorAll(
 "#about .head,#about .info,#services .head,#services .cards,#contact .head,#contact .desc,.card"
@@ -656,7 +875,9 @@ observer.observe(element);
 });
 
 
-/* Параллакс заголовка */
+/* =========================
+   ПАРАЛЛАКС ЗАГОЛОВКА
+========================= */
 
 addEventListener("scroll",()=>{
 
@@ -670,7 +891,9 @@ document.querySelector("h1").style.translate=
 });
 
 
-/* Уменьшение и прозрачность кнопки при скролле */
+/* =========================
+   КНОПКА ПОДДЕРЖКИ
+========================= */
 
 const support=document.querySelector(".support");
 
@@ -689,6 +912,201 @@ support.classList.remove("scrolling");
 },350);
 
 });
+
+
+/* =========================
+   AI-АССИСТЕНТ
+========================= */
+
+const aiChat=document.getElementById("aiChat");
+const aiOpen=document.getElementById("aiOpen");
+const aiClose=document.getElementById("aiClose");
+
+const aiForm=document.getElementById("aiForm");
+const aiInput=document.getElementById("aiInput");
+const aiSend=document.getElementById("aiSend");
+const aiMessages=document.getElementById("aiMessages");
+
+
+/*
+   Адрес твоего Cloudflare Worker
+*/
+
+const AI_WORKER_URL=
+"https://call-server-proxy.dmetro2484285.workers.dev/chat";
+
+
+/* Открытие окна */
+
+aiOpen.addEventListener("click",()=>{
+
+aiChat.classList.add("active");
+
+aiOpen.style.display="none";
+
+setTimeout(()=>{
+aiInput.focus();
+},100);
+
+});
+
+
+/* Закрытие окна */
+
+aiClose.addEventListener("click",()=>{
+
+aiChat.classList.remove("active");
+
+aiOpen.style.display="block";
+
+});
+
+
+/* Добавление сообщения */
+
+function addAIMessage(text,type){
+
+const message=document.createElement("div");
+
+message.className=
+"ai-message "+
+(type==="user" ? "ai-user" : "ai-bot");
+
+message.textContent=text;
+
+aiMessages.appendChild(message);
+
+aiMessages.scrollTop=
+aiMessages.scrollHeight;
+
+}
+
+
+/* Индикатор загрузки */
+
+function addAILoading(){
+
+const loading=document.createElement("div");
+
+loading.className=
+"ai-message ai-loading";
+
+loading.id="aiLoading";
+
+loading.textContent=
+"Печатает...";
+
+aiMessages.appendChild(loading);
+
+aiMessages.scrollTop=
+aiMessages.scrollHeight;
+
+}
+
+
+function removeAILoading(){
+
+const loading=
+document.getElementById("aiLoading");
+
+if(loading){
+loading.remove();
+}
+
+}
+
+
+/* Отправка сообщения */
+
+aiForm.addEventListener("submit",async(event)=>{
+
+event.preventDefault();
+
+const message=
+aiInput.value.trim();
+
+if(!message){
+return;
+}
+
+
+/* Показываем сообщение пользователя */
+
+addAIMessage(message,"user");
+
+aiInput.value="";
+
+aiInput.disabled=true;
+aiSend.disabled=true;
+
+addAILoading();
+
+
+try{
+
+const response=
+await fetch(AI_WORKER_URL,{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+message:message
+})
+
+});
+
+
+const data=
+await response.json();
+
+removeAILoading();
+
+
+if(!response.ok){
+
+throw new Error(
+data.error ||
+"Ошибка сервера"
+);
+
+}
+
+
+addAIMessage(
+data.answer ||
+"Не удалось получить ответ.",
+"bot"
+);
+
+
+}catch(error){
+
+removeAILoading();
+
+console.error(
+"Ошибка AI:",
+error
+);
+
+addAIMessage(
+"Не удалось связаться с AI-ассистентом. Попробуй ещё раз.",
+"bot"
+);
+
+}
+
+
+aiInput.disabled=false;
+aiSend.disabled=false;
+
+aiInput.focus();
+
+});
+
 
 </script>
 
