@@ -985,9 +985,233 @@
        AVATAR UPLOAD
        ========================================= */
 
-    avatarFile.addEventListener(
-      "change",
-      async () => {
+    avatarFile.addEventListener("change", async () => {
+
+  const file = avatarFile.files?.[0];
+
+  console.log("Выбранный файл:", file);
+
+  if (!file) {
+    showProfileMessage(
+      "Файл не выбран.",
+      "error"
+    );
+    return;
+  }
+
+  console.log("Имя:", file.name);
+  console.log("Тип:", file.type);
+  console.log("Размер:", file.size);
+
+
+  // Проверяем формат
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/gif"
+  ];
+
+  const extension =
+    file.name
+      .split(".")
+      .pop()
+      .toLowerCase();
+
+
+  const allowedExtensions = [
+    "jpg",
+    "jpeg",
+    "png",
+    "webp",
+    "gif"
+  ];
+
+
+  const typeIsValid =
+    allowedTypes.includes(file.type);
+
+  const extensionIsValid =
+    allowedExtensions.includes(extension);
+
+
+  if (!typeIsValid && !extensionIsValid) {
+
+    showProfileMessage(
+      "Этот файл не является изображением.",
+      "error"
+    );
+
+    avatarFile.value = "";
+
+    return;
+  }
+
+
+  // Ограничение размера
+  if (file.size > 10 * 1024 * 1024) {
+
+    showProfileMessage(
+      "Файл слишком большой. Максимум 10 МБ.",
+      "error"
+    );
+
+    avatarFile.value = "";
+
+    return;
+  }
+
+
+  // Показываем выбранную картинку сразу
+  const previewUrl =
+    URL.createObjectURL(file);
+
+  showAvatar(
+    previewUrl,
+    nickname.value ||
+    currentUser?.displayName ||
+    ""
+  );
+
+
+  showProfileMessage(
+    `Файл выбран: ${file.name}`,
+    "success"
+  );
+
+
+  // Загружаем файл
+  try {
+
+    showProfileMessage(
+      `Загружаем ${file.name}...`,
+      "info"
+    );
+
+
+    const formData =
+      new FormData();
+
+    formData.append(
+      "file",
+      file,
+      file.name
+    );
+
+
+    console.log(
+      "Отправляем файл:",
+      file.name,
+      file.type,
+      file.size
+    );
+
+
+    const response =
+      await fetch(
+        "https://picrd.com/api/upload",
+        {
+          method: "POST",
+          body: formData
+        }
+      );
+
+
+    console.log(
+      "HTTP статус:",
+      response.status
+    );
+
+
+    const responseText =
+      await response.text();
+
+    console.log(
+      "Ответ Picrd:",
+      responseText
+    );
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        `Сервер вернул ошибку ${response.status}`
+      );
+    }
+
+
+    let result;
+
+    try {
+
+      result =
+        JSON.parse(responseText);
+
+    } catch {
+
+      throw new Error(
+        "Сервер вернул ответ, который не является JSON."
+      );
+    }
+
+
+    console.log(
+      "Результат загрузки:",
+      result
+    );
+
+
+    const uploadedUrl =
+      result.url ||
+      result.link ||
+      result.image?.url ||
+      result.data?.url ||
+      result.data?.link;
+
+
+    if (!uploadedUrl) {
+
+      throw new Error(
+        "Сервис не вернул ссылку на загруженный файл."
+      );
+    }
+
+
+    uploadedAvatarUrl =
+      uploadedUrl;
+
+
+    showAvatar(
+      uploadedAvatarUrl,
+      nickname.value ||
+      currentUser?.displayName ||
+      ""
+    );
+
+
+    showProfileMessage(
+      "Аватар успешно загружен. Теперь сохрани профиль.",
+      "success"
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Ошибка загрузки аватара:",
+      error
+    );
+
+
+    showProfileMessage(
+      "Ошибка загрузки: " +
+      error.message,
+      "error"
+    );
+
+  }
+
+});
 
         const file =
           avatarFile.files[0];
