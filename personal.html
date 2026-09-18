@@ -1,1 +1,1565 @@
-<!DOCTYPE html> <html lang="ru"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Личный кабинет</title> <style> * { box-sizing: border-box; margin: 0; padding: 0; } body { min-height: 100vh; font-family: Arial, Helvetica, sans-serif; color: #fff; background: radial-gradient( circle at 15% 20%, rgba(255, 43, 43, 0.10), transparent 32% ), radial-gradient( circle at 85% 80%, rgba(90, 50, 255, 0.08), transparent 30% ), #080808; } header { height: 64px; width: 100%; display: flex; align-items: center; justify-content: flex-end; padding: 0 30px; background: rgba(10, 10, 10, 0.88); border-bottom: 1px solid rgba(255, 255, 255, 0.07); position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(12px); } .back-link { color: #aaa; text-decoration: none; padding: 9px 14px; border-radius: 9px; transition: 0.2s; } .back-link:hover { color: #fff; background: rgba(255, 255, 255, 0.07); } main { width: min(1100px, calc(100% - 30px)); margin: 45px auto 80px; } .page-title { margin-bottom: 28px; } .page-title h1 { font-size: 35px; margin-bottom: 8px; } .page-title p { color: #777; font-size: 14px; } /* LOGIN */ .login-card { width: min(520px, 100%); margin: 80px auto; padding: 35px; text-align: center; background: rgba(18, 18, 18, 0.96); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; box-shadow: 0 25px 80px rgba(0, 0, 0, 0.45); } .login-card h2 { font-size: 27px; margin-bottom: 10px; } .login-card p { color: #888; line-height: 1.5; margin-bottom: 25px; } /* CABINET */ .cabinet { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 24px; align-items: start; } .card { background: rgba(18, 18, 18, 0.96); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; box-shadow: 0 20px 70px rgba(0, 0, 0, 0.30); } /* LEFT PROFILE */ .profile-side { padding: 28px; text-align: center; } .avatar-wrapper { width: 150px; height: 150px; margin: 0 auto 20px; position: relative; } .avatar { width: 150px; height: 150px; display: block; object-fit: cover; border-radius: 50%; border: 3px solid #ff2b2b; background: #191919; box-shadow: 0 0 35px rgba(255, 43, 43, 0.18); } .avatar-placeholder { width: 150px; height: 150px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: linear-gradient( 145deg, #252525, #111 ); border: 3px solid #ff2b2b; color: #777; font-size: 48px; font-weight: 700; } .profile-name { font-size: 21px; font-weight: 700; margin-bottom: 7px; word-break: break-word; } .profile-email { color: #777; font-size: 13px; word-break: break-word; } .status { display: inline-flex; align-items: center; gap: 7px; margin-top: 18px; padding: 7px 12px; border-radius: 20px; color: #aaa; background: rgba(255, 255, 255, 0.05); font-size: 12px; } .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #42e66c; box-shadow: 0 0 8px rgba(66, 230, 108, 0.7); } /* FORM */ .profile-form { padding: 30px; } .profile-form h2 { font-size: 24px; margin-bottom: 8px; } .form-description { color: #777; font-size: 14px; margin-bottom: 30px; } .form-group { margin-bottom: 22px; } .form-group label { display: block; color: #ccc; font-size: 14px; font-weight: 600; margin-bottom: 8px; } input[type="text"], textarea { width: 100%; padding: 14px 15px; color: #fff; background: #111; border: 1px solid #2a2a2a; border-radius: 11px; outline: none; font-family: inherit; font-size: 15px; transition: 0.2s; } input[type="text"]:focus, textarea:focus { border-color: #ff2b2b; box-shadow: 0 0 0 3px rgba(255, 43, 43, 0.08); } textarea { min-height: 130px; resize: vertical; } .file-input { width: 100%; padding: 12px; color: #aaa; background: #111; border: 1px dashed #333; border-radius: 11px; cursor: pointer; } .file-input:hover { border-color: #ff2b2b; } /* BUTTONS */ .buttons { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; } .button { border: none; outline: none; padding: 13px 20px; border-radius: 11px; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: 0.15s transform, 0.15s background, 0.15s opacity; } .button:hover { transform: translateY(-1px); } .button:active { transform: translateY(0); } .button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; } .google-button { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; color: #111; background: #fff; } .google-button:hover { background: #eee; } .google-icon { font-weight: 900; font-size: 18px; } .save-button { color: #fff; background: #ff2b2b; } .save-button:hover { background: #e82121; } .logout { color: #ddd; background: #242424; } .logout:hover { background: #303030; } /* MESSAGES */ .message { min-height: 20px; margin-top: 17px; font-size: 14px; line-height: 1.45; } .message.success { color: #4ade80; } .message.error { color: #ff5555; } .message.info { color: #aaa; } /* HIDDEN */ .hidden { display: none !important; } /* MOBILE */ @media (max-width: 800px) { header { padding: 0 18px; } .cabinet { grid-template-columns: 1fr; } .page-title h1 { font-size: 29px; } } @media (max-width: 500px) { main { width: calc(100% - 20px); margin-top: 30px; } header { height: 58px; } .profile-form { padding: 22px; } .login-card { padding: 25px; } .buttons { flex-direction: column; } .button { width: 100%; } } </style> </head> <body> <header> <a href="index.html" class="back-link" > ← На главную </a> </header> <main> <div class="page-title"> <h1> Личный кабинет </h1> <p> Управление профилем и аккаунтом </p> </div> <!-- LOGIN --> <section id="loginSection" class="login-card" > <h2> Добро пожаловать </h2> <p> Войди через Google, чтобы открыть свой профиль. </p> <button id="googleLoginButton" class="button google-button" type="button" > <span class="google-icon"> G </span> Войти через Google </button> <div id="loginMessage" class="message" ></div> </section> <!-- CABINET --> <section id="cabinetSection" class="cabinet hidden" > <!-- LEFT PROFILE --> <aside class="card profile-side" > <div class="avatar-wrapper"> <div id="avatarPlaceholder" class="avatar-placeholder" > ? </div> <img id="avatar" class="avatar hidden" src="" alt="Аватар" > </div> <div id="profileName" class="profile-name" > Пользователь </div> <div id="profileEmail" class="profile-email" > </div> <div class="status"> <span class="status-dot"></span> Аккаунт активен </div> </aside> <!-- RIGHT --> <section class="card profile-form" > <h2> Настройки профиля </h2> <p class="form-description"> Здесь можно изменить данные своего профиля. </p> <!-- AVATAR --> <div class="form-group"> <label for="avatarFile"> Аватар </label> <input type="file" id="avatarFile" class="file-input" accept=".jpg,.jpeg,.png,.webp,.gif,image/jpeg,image/png,image/webp,image/gif" > </div> <!-- NICKNAME --> <div class="form-group"> <label for="nickname"> Никнейм </label> <input type="text" id="nickname" maxlength="30" placeholder="Введите никнейм" > </div> <!-- DESCRIPTION --> <div class="form-group"> <label for="description"> О себе </label> <textarea id="description" maxlength="500" placeholder="Расскажи немного о себе..." ></textarea> </div> <!-- BUTTONS --> <div class="buttons"> <button id="saveButton" class="button save-button" type="button" > Сохранить профиль </button> <button id="logoutButton" class="button logout" type="button" > Выйти из аккаунта </button> </div> <div id="profileMessage" class="message" ></div> </section> </section> </main> <script type="module"> /* ===================================================== FIREBASE IMPORTS ===================================================== */ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js"; import { initializeAuth, browserLocalPersistence, browserPopupRedirectResolver, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js"; import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js"; import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-storage.js"; /* ===================================================== FIREBASE CONFIG ===================================================== */ const firebaseConfig = { apiKey: "AIzaSyBqGLonGIt2m_55dt1DWjzhLGnL7m6N0J4", authDomain: "physical-numbers.firebaseapp.com", projectId: "physical-numbers", storageBucket: "physical-numbers.firebasestorage.app", messagingSenderId: "1031207446971", appId: "1:1031207446971:web:ed03e122d4727f8e28fc9", measurementId: "G-S8J83CEQWL" }; /* ===================================================== FIREBASE INIT ===================================================== */ const app = initializeApp( firebaseConfig ); const auth = initializeAuth( app, { persistence: browserLocalPersistence, popupRedirectResolver: browserPopupRedirectResolver } ); const db = getFirestore( app ); const storage = getStorage( app ); const googleProvider = new GoogleAuthProvider(); googleProvider.setCustomParameters({ prompt: "select_account" }); /* ===================================================== ELEMENTS ===================================================== */ const loginSection = document.getElementById( "loginSection" ); const cabinetSection = document.getElementById( "cabinetSection" ); const googleLoginButton = document.getElementById( "googleLoginButton" ); const logoutButton = document.getElementById( "logoutButton" ); const saveButton = document.getElementById( "saveButton" ); const avatarFile = document.getElementById( "avatarFile" ); const avatar = document.getElementById( "avatar" ); const avatarPlaceholder = document.getElementById( "avatarPlaceholder" ); const nickname = document.getElementById( "nickname" ); const description = document.getElementById( "description" ); const profileName = document.getElementById( "profileName" ); const profileEmail = document.getElementById( "profileEmail" ); const loginMessage = document.getElementById( "loginMessage" ); const profileMessage = document.getElementById( "profileMessage" ); let currentUser = null; let uploadedAvatarUrl = ""; /* ===================================================== MESSAGES ===================================================== */ function loginMsg( text, type = "info" ) { loginMessage.textContent = text; loginMessage.className = "message " + type; } function profileMsg( text, type = "info" ) { profileMessage.textContent = text; profileMessage.className = "message " + type; } /* ===================================================== AVATAR DISPLAY ===================================================== */ function showAvatar( url, name = "" ) { if (url) { avatar.src = url; avatar.classList.remove( "hidden" ); avatarPlaceholder.classList.add( "hidden" ); return; } avatar.src = ""; avatar.classList.add( "hidden" ); avatarPlaceholder.classList.remove( "hidden" ); const firstLetter = name ? name .trim() .charAt(0) .toUpperCase() : "?"; avatarPlaceholder.textContent = firstLetter || "?"; } /* ===================================================== LOAD PROFILE ===================================================== */ async function loadProfile( user ) { try { const userRef = doc( db, "users", user.uid ); const snapshot = await getDoc( userRef ); if ( snapshot.exists() ) { const data = snapshot.data(); nickname.value = data.nickname || user.displayName || ""; description.value = data.description || ""; uploadedAvatarUrl = data.avatarUrl || ""; profileName.textContent = data.nickname || user.displayName || "Пользователь"; showAvatar( uploadedAvatarUrl || user.photoURL || "", profileName.textContent ); } else { nickname.value = user.displayName || ""; description.value = ""; uploadedAvatarUrl = ""; profileName.textContent = user.displayName || "Пользователь"; showAvatar( user.photoURL || "", profileName.textContent ); } } catch (error) { console.error( "Ошибка загрузки профиля:", error ); profileMsg( "Не удалось загрузить профиль: " + error.message, "error" ); } } /* ===================================================== GOOGLE LOGIN ===================================================== */ googleLoginButton.addEventListener( "click", async () => { googleLoginButton.disabled = true; loginMsg( "Открываем Google...", "info" ); try { await signInWithPopup( auth, googleProvider ); } catch (error) { console.error( "Google login error:", error ); if ( error.code === "auth/popup-blocked" ) { loginMsg( "Окно Google заблокировано. Переключаемся на вход через страницу...", "info" ); try { await signInWithRedirect( auth, googleProvider ); return; } catch ( redirectError ) { console.error( redirectError ); loginMsg( "Ошибка входа: " + redirectError.message, "error" ); } } else if ( error.code === "auth/popup-closed-by-user" ) { loginMsg( "Окно Google было закрыто.", "error" ); } else if ( error.code === "auth/unauthorized-domain" ) { loginMsg( "Домен сайта не разрешён в Firebase Authentication.", "error" ); } else if ( error.code === "auth/api-key-not-valid" ) { loginMsg( "Firebase API key указан неправильно.", "error" ); } else { loginMsg( "Ошибка Google: " + ( error.message || error.code || "неизвестная ошибка" ), "error" ); } } finally { googleLoginButton.disabled = false; } } ); /* ===================================================== REDIRECT RESULT ===================================================== */ try { const redirectResult = await getRedirectResult( auth ); if ( redirectResult && redirectResult.user ) { console.log( "Вход через redirect выполнен." ); } } catch (error) { console.error( "Redirect error:", error ); loginMsg( "Ошибка входа через Google: " + ( error.message || error.code ), "error" ); } /* ===================================================== AVATAR UPLOAD ===================================================== */ avatarFile.addEventListener( "change", async () => { const file = avatarFile.files?.[0]; if (!file) { return; } if (!currentUser) { profileMsg( "Сначала войди в аккаунт.", "error" ); avatarFile.value = ""; return; } /* ALLOWED TYPES */ const allowedTypes = [ "image/jpeg", "image/png", "image/webp", "image/gif" ]; const allowedExtensions = [ "jpg", "jpeg", "png", "webp", "gif" ]; const extension = file.name .split(".") .pop() .toLowerCase(); const typeAllowed = allowedTypes.includes( file.type ); const extensionAllowed = allowedExtensions.includes( extension ); if ( !typeAllowed && !extensionAllowed ) { profileMsg( "Можно загрузить JPG, JPEG, PNG, WEBP или GIF.", "error" ); avatarFile.value = ""; return; } /* SIZE */ if ( file.size > 10 * 1024 * 1024 ) { profileMsg( "Файл слишком большой. Максимум 10 МБ.", "error" ); avatarFile.value = ""; return; } /* LOCAL PREVIEW */ const previewUrl = URL.createObjectURL( file ); showAvatar( previewUrl, nickname.value || currentUser.displayName || "" ); profileMsg( "Аватар выбран. Загружаем в Firebase...", "info" ); try { /* Загружаем файл в: Firebase Storage users / UID / avatar.jpg */ const extensionForStorage = extension === "jpeg" ? "jpg" : extension; const storagePath = "users/" + currentUser.uid + "/avatar." + extensionForStorage; const avatarRef = ref( storage, storagePath ); await uploadBytes( avatarRef, file, { contentType: file.type } ); /* GET PERMANENT DOWNLOAD URL */ const downloadUrl = await getDownloadURL( avatarRef ); uploadedAvatarUrl = downloadUrl; /* Сразу сохраняем URL в Firestore. Поэтому даже если пользователь забудет нажать кнопку сохранения, ссылка на новый аватар уже будет записана. */ await setDoc( doc( db, "users", currentUser.uid ), { avatarUrl: uploadedAvatarUrl, updatedAt: Date.now() }, { merge: true } ); showAvatar( uploadedAvatarUrl, nickname.value || currentUser.displayName || "" ); profileMsg( "Аватар успешно загружен и сохранён.", "success" ); } catch (error) { console.error( "Firebase Storage error:", error ); /* Превью оставляем, но сообщаем настоящую ошибку. */ if ( error.code === "storage/unauthorized" ) { profileMsg( "Firebase Storage запретил загрузку. Нужно проверить правила Storage.", "error" ); } else if ( error.code === "storage/object-not-found" ) { profileMsg( "Firebase Storage не найден.", "error" ); } else { profileMsg( "Ошибка загрузки аватара: " + ( error.message || error.code ), "error" ); } } finally { avatarFile.value = ""; } } ); /* ===================================================== SAVE PROFILE ===================================================== */ saveButton.addEventListener( "click", async () => { if (!currentUser) { profileMsg( "Ты не авторизован.", "error" ); return; } const nick = nickname.value.trim(); const about = description.value.trim(); if ( nick.length < 2 ) { profileMsg( "Никнейм должен содержать минимум 2 символа.", "error" ); nickname.focus(); return; } saveButton.disabled = true; profileMsg( "Сохраняем профиль...", "info" ); try { const userRef = doc( db, "users", currentUser.uid ); await setDoc( userRef, { uid: currentUser.uid, email: currentUser.email || "", nickname: nick, description: about, avatarUrl: uploadedAvatarUrl || currentUser.photoURL || "", updatedAt: Date.now() }, { merge: true } ); profileName.textContent = nick; showAvatar( uploadedAvatarUrl || currentUser.photoURL || "", nick ); profileMsg( "Профиль успешно сохранён.", "success" ); } catch (error) { console.error( "Firestore error:", error ); if ( error.code === "permission-denied" ) { profileMsg( "Firestore запретил сохранение профиля. Проверь правила Firestore.", "error" ); } else { profileMsg( "Ошибка сохранения: " + ( error.message || error.code ), "error" ); } } finally { saveButton.disabled = false; } } ); /* ===================================================== LOGOUT ===================================================== */ logoutButton.addEventListener( "click", async () => { logoutButton.disabled = true; try { await signOut( auth ); } catch (error) { console.error( error ); profileMsg( "Ошибка выхода: " + error.message, "error" ); logoutButton.disabled = false; } } ); /* ===================================================== AUTH STATE ===================================================== */ onAuthStateChanged( auth, async (user) => { currentUser = user; if (user) { loginSection.classList.add( "hidden" ); cabinetSection.classList.remove( "hidden" ); profileEmail.textContent = user.email || ""; profileName.textContent = user.displayName || "Пользователь"; showAvatar( user.photoURL || "", user.displayName || "" ); await loadProfile( user ); } else { loginSection.classList.remove( "hidden" ); cabinetSection.classList.add( "hidden" ); currentUser = null; } } ); </script> </body> </html>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Личный кабинет — Физические Номера</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      color: #fff;
+      background:
+        radial-gradient(circle at top left, #24134d 0%, transparent 35%),
+        radial-gradient(circle at bottom right, #40152c 0%, transparent 35%),
+        #0b0b10;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    .page {
+      min-height: 100vh;
+      padding: 30px 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 950px;
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .logo {
+      font-size: 25px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .back-btn,
+    .logout-btn,
+    .google-btn,
+    .save-btn,
+    .upload-btn {
+      border: none;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .back-btn {
+      padding: 11px 16px;
+      border-radius: 12px;
+      background: #191922;
+      color: #fff;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .back-btn:hover {
+      background: #252531;
+      transform: translateY(-1px);
+    }
+
+    .login-card,
+    .profile-card {
+      background: rgba(18, 18, 25, 0.94);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 22px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+
+    .login-card {
+      max-width: 520px;
+      margin: 70px auto;
+      padding: 35px;
+      text-align: center;
+    }
+
+    .login-card h1 {
+      font-size: 30px;
+      margin-bottom: 12px;
+    }
+
+    .login-card p {
+      color: #a8a8b4;
+      line-height: 1.5;
+      margin-bottom: 25px;
+    }
+
+    .google-btn {
+      width: 100%;
+      padding: 15px;
+      border-radius: 13px;
+      background: #fff;
+      color: #111;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .google-btn:hover {
+      background: #e9e9e9;
+      transform: translateY(-1px);
+    }
+
+    .google-btn:disabled,
+    .save-btn:disabled,
+    .upload-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .profile-card {
+      overflow: hidden;
+    }
+
+    .profile-header {
+      padding: 30px;
+      background:
+        linear-gradient(
+          135deg,
+          rgba(111, 67, 255, 0.20),
+          rgba(255, 43, 43, 0.10)
+        );
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .profile-header-inner {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+    }
+
+    .avatar-wrapper {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .avatar {
+      width: 115px;
+      height: 115px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #25252f;
+      border: 3px solid rgba(255,255,255,0.15);
+      display: block;
+    }
+
+    .avatar-placeholder {
+      width: 115px;
+      height: 115px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #272735, #15151d);
+      border: 3px solid rgba(255,255,255,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 42px;
+      font-weight: 800;
+      color: #aaa;
+    }
+
+    .profile-main-info {
+      min-width: 0;
+    }
+
+    .profile-main-info h1 {
+      font-size: 28px;
+      margin-bottom: 7px;
+      word-break: break-word;
+    }
+
+    .email {
+      color: #a8a8b4;
+      word-break: break-word;
+    }
+
+    .content {
+      padding: 30px;
+    }
+
+    .section {
+      margin-bottom: 30px;
+    }
+
+    .section:last-child {
+      margin-bottom: 0;
+    }
+
+    .section-title {
+      font-size: 19px;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .field:last-child {
+      margin-bottom: 0;
+    }
+
+    .field label {
+      display: block;
+      color: #b7b7c2;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      border: 1px solid #2c2c38;
+      background: #101017;
+      color: #fff;
+      border-radius: 12px;
+      padding: 13px 14px;
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      border-color: #6e49ff;
+      box-shadow: 0 0 0 3px rgba(110,73,255,0.12);
+    }
+
+    .field textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .readonly {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .avatar-upload-box {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+      padding: 18px;
+      border-radius: 15px;
+      background: #111119;
+      border: 1px solid #252531;
+    }
+
+    .upload-info {
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .upload-info strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .upload-info span {
+      color: #858592;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .upload-btn {
+      padding: 12px 16px;
+      border-radius: 11px;
+      background: #292936;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .upload-btn:hover {
+      background: #363644;
+    }
+
+    #avatarInput {
+      display: none;
+    }
+
+    .save-area {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      padding-top: 5px;
+    }
+
+    .save-btn {
+      padding: 13px 22px;
+      border-radius: 12px;
+      background: #6e49ff;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .save-btn:hover {
+      background: #7b5aff;
+      transform: translateY(-1px);
+    }
+
+    .logout-btn {
+      padding: 13px 20px;
+      border-radius: 12px;
+      background: #2a1b20;
+      color: #ff8e9c;
+      font-weight: 600;
+    }
+
+    .logout-btn:hover {
+      background: #392128;
+    }
+
+    .status {
+      min-height: 20px;
+      font-size: 14px;
+      color: #aaa;
+    }
+
+    .status.success {
+      color: #67d995;
+    }
+
+    .status.error {
+      color: #ff7272;
+    }
+
+    .status.loading {
+      color: #b4a8ff;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .loading-screen {
+      text-align: center;
+      padding: 80px 20px;
+      color: #aaa;
+    }
+
+    .spinner {
+      width: 32px;
+      height: 32px;
+      margin: 0 auto 15px;
+      border: 3px solid #2b2b35;
+      border-top-color: #6e49ff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 650px) {
+      .page {
+        padding: 18px 12px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+      }
+
+      .logo {
+        font-size: 20px;
+      }
+
+      .profile-header,
+      .content {
+        padding: 20px;
+      }
+
+      .profile-header-inner {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .profile-main-info h1 {
+        font-size: 23px;
+      }
+
+      .avatar,
+      .avatar-placeholder {
+        width: 100px;
+        height: 100px;
+      }
+
+      .login-card {
+        margin: 35px auto;
+        padding: 25px 20px;
+      }
+
+      .save-area {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .save-btn,
+      .logout-btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="page">
+  <div class="container">
+
+    <div class="topbar">
+      <div class="logo">Физические Номера</div>
+
+      <a href="index.html" class="back-btn">
+        На главную
+      </a>
+    </div>
+
+    <!-- Загрузка -->
+    <div id="loadingScreen" class="loading-screen">
+      <div class="spinner"></div>
+      Проверяем авторизацию...
+    </div>
+
+    <!-- Не авторизован -->
+    <div id="loginCard" class="login-card hidden">
+      <h1>Личный кабинет</h1>
+
+      <p>
+        Войди через Google, чтобы сохранять профиль,
+        описание и аватар.
+      </p>
+
+      <button id="googleLoginBtn" class="google-btn" type="button">
+        Войти через Google
+      </button>
+
+      <div id="loginStatus" class="status"></div>
+    </div>
+
+    <!-- Профиль -->
+    <div id="profileCard" class="profile-card hidden">
+
+      <div class="profile-header">
+        <div class="profile-header-inner">
+
+          <div class="avatar-wrapper">
+            <img
+              id="avatarPreview"
+              class="avatar hidden"
+              alt="Аватар профиля"
+            >
+
+            <div
+              id="avatarPlaceholder"
+              class="avatar-placeholder"
+            >
+              ?
+            </div>
+          </div>
+
+          <div class="profile-main-info">
+            <h1 id="profileTitle">
+              Мой профиль
+            </h1>
+
+            <div id="profileEmail" class="email">
+              Загрузка...
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="content">
+
+        <!-- Аватар -->
+        <div class="section">
+
+          <div class="section-title">
+            Аватар
+          </div>
+
+          <div class="avatar-upload-box">
+
+            <div class="upload-info">
+              <strong>Фотография профиля</strong>
+
+              <span>
+                JPG, JPEG, PNG, WebP или GIF.
+                Максимальный размер — 10 МБ.
+              </span>
+            </div>
+
+            <input
+              id="avatarInput"
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+            >
+
+            <button
+              id="chooseAvatarBtn"
+              class="upload-btn"
+              type="button"
+            >
+              Выбрать фото
+            </button>
+
+          </div>
+
+          <div
+            id="avatarStatus"
+            class="status"
+            style="margin-top: 10px;"
+          ></div>
+
+        </div>
+
+        <!-- Основные данные -->
+        <div class="section">
+
+          <div class="section-title">
+            Информация
+          </div>
+
+          <div class="field">
+            <label for="nickname">
+              Никнейм
+            </label>
+
+            <input
+              id="nickname"
+              type="text"
+              maxlength="40"
+              placeholder="Например: nikto242"
+            >
+          </div>
+
+          <div class="field">
+            <label for="description">
+              О себе
+            </label>
+
+            <textarea
+              id="description"
+              maxlength="500"
+              placeholder="Расскажи немного о себе..."
+            ></textarea>
+          </div>
+
+          <div class="field">
+            <label for="email">
+              Email Google
+            </label>
+
+            <input
+              id="email"
+              class="readonly"
+              type="text"
+              readonly
+            >
+          </div>
+
+        </div>
+
+        <!-- Сохранение -->
+        <div class="section">
+
+          <div class="save-area">
+
+            <button
+              id="saveBtn"
+              class="save-btn"
+              type="button"
+            >
+              Сохранить профиль
+            </button>
+
+            <button
+              id="logoutBtn"
+              class="logout-btn"
+              type="button"
+            >
+              Выйти
+            </button>
+
+            <div
+              id="saveStatus"
+              class="status"
+            ></div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<script type="module">
+
+  import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+  import {
+    getAuth,
+    GoogleAuthProvider,
+    signInWithPopup,
+    signOut,
+    onAuthStateChanged,
+    setPersistence,
+    browserLocalPersistence
+  }
+    from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+  import {
+    getFirestore,
+    doc,
+    getDoc,
+    setDoc,
+    serverTimestamp
+  }
+    from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+  /*
+    ============================================================
+    FIREBASE CONFIG
+    ============================================================
+
+    ВАЖНО:
+
+    Вставь сюда свой настоящий apiKey из Firebase.
+
+    Остальные значения оставь своими, если они уже правильные.
+  */
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBqGLonGIt2m_55dt1DWjzhLGnL7m6N0J4",
+    authDomain: "physical-numbers.firebaseapp.com",
+    projectId: "physical-numbers",
+    storageBucket: "physical-numbers.firebasestorage.app",
+    messagingSenderId: "1031207446971",
+    appId: "1:1031207446971:web:ed03e122d4727f8e28fc9e",
+    measurementId: "G-S8J83CEQWL"
+  };
+
+
+  /*
+    ============================================================
+    FIREBASE
+    ============================================================
+  */
+
+  const app = initializeApp(firebaseConfig);
+
+  const auth = getAuth(app);
+
+  const db = getFirestore(app);
+
+  const provider = new GoogleAuthProvider();
+
+
+  /*
+    ============================================================
+    ЭЛЕМЕНТЫ
+    ============================================================
+  */
+
+  const loadingScreen =
+    document.getElementById("loadingScreen");
+
+  const loginCard =
+    document.getElementById("loginCard");
+
+  const profileCard =
+    document.getElementById("profileCard");
+
+  const googleLoginBtn =
+    document.getElementById("googleLoginBtn");
+
+  const loginStatus =
+    document.getElementById("loginStatus");
+
+  const profileTitle =
+    document.getElementById("profileTitle");
+
+  const profileEmail =
+    document.getElementById("profileEmail");
+
+  const nicknameInput =
+    document.getElementById("nickname");
+
+  const descriptionInput =
+    document.getElementById("description");
+
+  const emailInput =
+    document.getElementById("email");
+
+  const avatarInput =
+    document.getElementById("avatarInput");
+
+  const chooseAvatarBtn =
+    document.getElementById("chooseAvatarBtn");
+
+  const avatarPreview =
+    document.getElementById("avatarPreview");
+
+  const avatarPlaceholder =
+    document.getElementById("avatarPlaceholder");
+
+  const avatarStatus =
+    document.getElementById("avatarStatus");
+
+  const saveBtn =
+    document.getElementById("saveBtn");
+
+  const saveStatus =
+    document.getElementById("saveStatus");
+
+  const logoutBtn =
+    document.getElementById("logoutBtn");
+
+
+  /*
+    ============================================================
+    СОСТОЯНИЕ
+    ============================================================
+  */
+
+  let currentUser = null;
+
+  let currentAvatarUrl = "";
+
+  let selectedAvatarFile = null;
+
+
+  /*
+    ============================================================
+    ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+    ============================================================
+  */
+
+  function setStatus(element, text, type = "") {
+
+    element.textContent = text;
+
+    element.className = "status";
+
+    if (type) {
+      element.classList.add(type);
+    }
+  }
+
+
+  function getInitials(user) {
+
+    const name =
+      user?.displayName ||
+      user?.email ||
+      "?";
+
+    const words =
+      name
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+
+    if (words.length >= 2) {
+
+      return (
+        words[0][0] +
+        words[1][0]
+      ).toUpperCase();
+
+    }
+
+    return name
+      .slice(0, 2)
+      .toUpperCase();
+  }
+
+
+  function showAvatar(url, user = currentUser) {
+
+    if (url) {
+
+      avatarPreview.src = url;
+
+      avatarPreview.classList.remove("hidden");
+
+      avatarPlaceholder.classList.add("hidden");
+
+      return;
+    }
+
+    avatarPreview.removeAttribute("src");
+
+    avatarPreview.classList.add("hidden");
+
+    avatarPlaceholder.textContent =
+      getInitials(user);
+
+    avatarPlaceholder.classList.remove("hidden");
+  }
+
+
+  function isValidImage(file) {
+
+    if (!file) {
+      return false;
+    }
+
+    const allowedTypes = [
+      "image/png",
+      "image/jpeg",
+      "image/webp",
+      "image/gif"
+    ];
+
+    return allowedTypes.includes(file.type);
+  }
+
+
+  /*
+    ============================================================
+    FIREBASE AUTH PERSISTENCE
+    ============================================================
+
+    Сессия сохраняется локально.
+  */
+
+  try {
+
+    await setPersistence(
+      auth,
+      browserLocalPersistence
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Не удалось установить persistence:",
+      error
+    );
+
+  }
+
+
+  /*
+    ============================================================
+    GOOGLE LOGIN
+    ============================================================
+  */
+
+  googleLoginBtn.addEventListener(
+    "click",
+    async () => {
+
+      googleLoginBtn.disabled = true;
+
+      setStatus(
+        loginStatus,
+        "Открываем Google...",
+        "loading"
+      );
+
+      try {
+
+        await signInWithPopup(
+          auth,
+          provider
+        );
+
+        setStatus(
+          loginStatus,
+          "Вход выполнен.",
+          "success"
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Ошибка Google входа:",
+          error
+        );
+
+        let message =
+          "Не удалось войти через Google.";
+
+        if (
+          error.code ===
+          "auth/popup-closed-by-user"
+        ) {
+
+          message =
+            "Окно Google было закрыто.";
+
+        } else if (
+          error.code ===
+          "auth/popup-blocked"
+        ) {
+
+          message =
+            "Браузер заблокировал окно Google.";
+
+        } else if (
+          error.code ===
+          "auth/unauthorized-domain"
+        ) {
+
+          message =
+            "Этот домен не добавлен в Firebase Authentication.";
+
+        } else if (
+          error.code ===
+          "auth/operation-not-allowed"
+        ) {
+
+          message =
+            "В Firebase не включён вход через Google.";
+
+        } else if (
+          error.code ===
+          "auth/network-request-failed"
+        ) {
+
+          message =
+            "Проблема с интернет-соединением.";
+
+        }
+
+        setStatus(
+          loginStatus,
+          message,
+          "error"
+        );
+
+      } finally {
+
+        googleLoginBtn.disabled = false;
+
+      }
+
+    }
+  );
+
+
+  /*
+    ============================================================
+    AVATAR — ВЫБОР ФАЙЛА
+    ============================================================
+  */
+
+  chooseAvatarBtn.addEventListener(
+    "click",
+    () => {
+
+      avatarInput.click();
+
+    }
+  );
+
+
+  avatarInput.addEventListener(
+    "change",
+    () => {
+
+      const file =
+        avatarInput.files?.[0];
+
+      if (!file) {
+        return;
+      }
+
+
+      if (!isValidImage(file)) {
+
+        setStatus(
+          avatarStatus,
+          "Можно загрузить только JPG, PNG, WebP или GIF.",
+          "error"
+        );
+
+        avatarInput.value = "";
+
+        return;
+      }
+
+
+      if (file.size > 10 * 1024 * 1024) {
+
+        setStatus(
+          avatarStatus,
+          "Файл слишком большой. Максимум — 10 МБ.",
+          "error"
+        );
+
+        avatarInput.value = "";
+
+        return;
+      }
+
+
+      selectedAvatarFile = file;
+
+
+      const localUrl =
+        URL.createObjectURL(file);
+
+      showAvatar(
+        localUrl,
+        currentUser
+      );
+
+
+      setStatus(
+        avatarStatus,
+        "Фото выбрано. Нажми «Сохранить профиль».",
+        "loading"
+      );
+
+    }
+  );
+
+
+  /*
+    ============================================================
+    PICRD UPLOAD
+    ============================================================
+
+    Firebase Storage НЕ используется.
+
+    Если Picrd разрешает запросы с GitHub Pages,
+    изображение загрузится и вернётся URL.
+
+    Если браузер пишет "Failed to fetch",
+    это может быть CORS/сетевое ограничение самого Picrd.
+  */
+
+  async function uploadAvatarToPicrd(file) {
+
+    const formData =
+      new FormData();
+
+    formData.append(
+      "file",
+      file
+    );
+
+
+    const controller =
+      new AbortController();
+
+    const timeout =
+      setTimeout(
+        () => controller.abort(),
+        30000
+      );
+
+
+    try {
+
+      const response =
+        await fetch(
+          "https://picrd.com/api/upload",
+          {
+            method: "POST",
+            body: formData,
+            signal: controller.signal
+          }
+        );
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          `Picrd HTTP ${response.status}`
+        );
+
+      }
+
+
+      const data =
+        await response.json();
+
+
+      console.log(
+        "Ответ Picrd:",
+        data
+      );
+
+
+      /*
+        Пытаемся найти URL изображения
+        в разных возможных вариантах ответа.
+      */
+
+      const url =
+        data?.url ||
+        data?.image?.url ||
+        data?.data?.url ||
+        data?.result?.url ||
+        data?.link ||
+        data?.image_url;
+
+
+      if (!url) {
+
+        throw new Error(
+          "Picrd не вернул URL изображения."
+        );
+
+      }
+
+
+      return url;
+
+    } finally {
+
+      clearTimeout(timeout);
+
+    }
+
+  }
+
+
+  /*
+    ============================================================
+    ЗАГРУЗКА / СОХРАНЕНИЕ ПРОФИЛЯ
+    ============================================================
+  */
+
+  async function loadProfile(user) {
+
+    const profileRef =
+      doc(
+        db,
+        "users",
+        user.uid
+      );
+
+
+    try {
+
+      const snapshot =
+        await getDoc(profileRef);
+
+
+      if (snapshot.exists()) {
+
+        const data =
+          snapshot.data();
+
+
+        nicknameInput.value =
+          data.nickname || "";
+
+
+        descriptionInput.value =
+          data.description || "";
+
+
+        currentAvatarUrl =
+          data.avatarUrl || "";
+
+
+        if (currentAvatarUrl) {
+
+          showAvatar(
+            currentAvatarUrl,
+            user
+          );
+
+        } else {
+
+          showAvatar(
+            user.photoURL || "",
+            user
+          );
+
+        }
+
+      } else {
+
+        nicknameInput.value =
+          user.displayName || "";
+
+
+        descriptionInput.value =
+          "";
+
+
+        currentAvatarUrl =
+          user.photoURL || "";
+
+
+        showAvatar(
+          currentAvatarUrl,
+          user
+        );
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        "Ошибка загрузки профиля:",
+        error
+      );
+
+      setStatus(
+        saveStatus,
+        "Не удалось загрузить данные профиля.",
+        "error"
+      );
+
+    }
+
+  }
+
+
+  /*
+    ============================================================
+    SAVE PROFILE
+    ============================================================
+  */
+
+  saveBtn.addEventListener(
+    "click",
+    async () => {
+
+      if (!currentUser) {
+
+        setStatus(
+          saveStatus,
+          "Сначала войди через Google.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      saveBtn.disabled = true;
+
+      setStatus(
+        saveStatus,
+        "Сохраняем профиль...",
+        "loading"
+      );
+
+
+      try {
+
+        /*
+          Если выбрали новое фото —
+          сначала пытаемся загрузить его.
+        */
+
+        if (selectedAvatarFile) {
+
+          setStatus(
+            avatarStatus,
+            "Загружаем аватар...",
+            "loading"
+          );
+
+
+          try {
+
+            const uploadedUrl =
+              await uploadAvatarToPicrd(
+                selectedAvatarFile
+              );
+
+
+            currentAvatarUrl =
+              uploadedUrl;
+
+
+            showAvatar(
+              currentAvatarUrl,
+              currentUser
+            );
+
+
+            setStatus(
+              avatarStatus,
+              "Аватар загружен.",
+              "success"
+            );
+
+
+            selectedAvatarFile = null;
+
+            avatarInput.value = "";
+
+          } catch (avatarError) {
+
+            console.error(
+              "Ошибка загрузки аватара:",
+              avatarError
+            );
+
+
+            let avatarMessage =
+              "Аватар не загрузился.";
+
+
+            if (
+              avatarError?.name ===
+              "AbortError"
+            ) {
+
+              avatarMessage =
+                "Picrd слишком долго не отвечал.";
+
+            } else if (
+              avatarError?.message
+                ?.toLowerCase()
+                .includes("failed to fetch")
+            ) {
+
+              avatarMessage =
+                "Браузер не смог обратиться к Picrd. Это может быть ограничение CORS.";
+
+            } else {
+
+              avatarMessage =
+                "Аватар не загрузился: " +
+                avatarError.message;
+
+            }
+
+
+            setStatus(
+              avatarStatus,
+              avatarMessage,
+              "error"
+            );
+
+
+            /*
+              ВАЖНО:
+              профиль всё равно может сохраниться.
+              Старый avatarUrl не затираем.
+            */
+
+            selectedAvatarFile = null;
+
+            avatarInput.value = "";
+
+          }
+
+        }
+
+
+        /*
+          Сохраняем Firestore.
+        */
+
+        const profileRef =
+          doc(
+            db,
+            "users",
+            currentUser.uid
+          );
+
+
+        await setDoc(
+          profileRef,
+          {
+            nickname:
+              nicknameInput.value.trim(),
+
+            description:
+              descriptionInput.value.trim(),
+
+            email:
+              currentUser.email || "",
+
+            googleName:
+              currentUser.displayName || "",
+
+            avatarUrl:
+              currentAvatarUrl || "",
+
+            updatedAt:
+              serverTimestamp()
+          },
+          {
+            merge: true
+          }
+        );
+
+
+        profileTitle.textContent =
+          nicknameInput.value.trim() ||
+          currentUser.displayName ||
+          "Мой профиль";
+
+
+        setStatus(
+          saveStatus,
+          "Профиль сохранён.",
+          "success"
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Ошибка сохранения:",
+          error
+        );
+
+
+        setStatus(
+          saveStatus,
+          "Не удалось сохранить профиль: " +
+          error.message,
+          "error"
+        );
+
+      } finally {
+
+        saveBtn.disabled = false;
+
+      }
+
+    }
+  );
+
+
+  /*
+    ============================================================
+    LOGOUT
+    ============================================================
+  */
+
+  logoutBtn.addEventListener(
+    "click",
+    async () => {
+
+      logoutBtn.disabled = true;
+
+      try {
+
+        await signOut(auth);
+
+      } catch (error) {
+
+        console.error(
+          "Ошибка выхода:",
+          error
+        );
+
+        logoutBtn.disabled = false;
+
+      }
+
+    }
+  );
+
+
+  /*
+    ============================================================
+    AUTH STATE
+    ============================================================
+  */
+
+  onAuthStateChanged(
+    auth,
+    async (user) => {
+
+      loadingScreen.classList.add(
+        "hidden"
+      );
+
+
+      if (!user) {
+
+        currentUser = null;
+
+        profileCard.classList.add(
+          "hidden"
+        );
+
+        loginCard.classList.remove(
+          "hidden"
+        );
+
+        return;
+      }
+
+
+      /*
+        Пользователь авторизован.
+      */
+
+      currentUser = user;
+
+
+      loginCard.classList.add(
+        "hidden"
+      );
+
+      profileCard.classList.remove(
+        "hidden"
+      );
+
+
+      profileEmail.textContent =
+        user.email || "Email не указан";
+
+
+      emailInput.value =
+        user.email || "";
+
+
+      profileTitle.textContent =
+        user.displayName ||
+        "Мой профиль";
+
+
+      showAvatar(
+        user.photoURL || "",
+        user
+      );
+
+
+      await loadProfile(user);
+
+    }
+  );
+
+</script>
+
+</body>
+</html>
