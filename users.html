@@ -32,16 +32,11 @@ h1{margin:0;font-size:clamp(44px,8vw,88px);font-weight:500;letter-spacing:-5px;l
 .user-copy h2{margin:0;font-size:16px;font-weight:600;overflow-wrap:anywhere}
 .user-heading{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .creator-badge{padding:4px 7px;border:1px solid #d0d0d0;color:#777;font-size:10px;letter-spacing:1px;text-transform:uppercase}
+.scam-badge{padding:4px 7px;border:1px solid #b42318;background:#fff0ee;color:#b42318;font-size:10px;font-weight:700;letter-spacing:1px}
 .user-copy p{margin:6px 0 0;color:#777;font-size:13px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .admin-tools{margin:0 0 28px;padding:18px;border:1px solid #d0d0d0;background:#eee}
 .admin-tools h2{margin:0 0 8px;font-size:15px;font-weight:600}
 .admin-tools p{margin:0 0 14px;color:#666;font-size:12px;line-height:1.5}
-.admin-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.admin-tools button{min-height:40px;padding:0 13px;border:1px solid #111;background:#111;color:#fff;cursor:pointer;font:13px Arial}
-.admin-tools button:hover{background:transparent;color:#111}
-.admin-tools button:disabled{opacity:.55;cursor:wait}
-.admin-tools input{min-width:240px;min-height:40px;padding:0 12px;border:1px solid #ccc;background:#fff;color:#111;font:13px Arial}
-.admin-status{min-height:18px;margin-top:10px;color:#666;font-size:12px}
 .more{min-height:46px;margin-top:24px;padding:0 20px;border:1px solid #111;background:#111;color:#fff;cursor:pointer;font:14px Arial}
 .more:hover{background:transparent;color:#111}
 .more:disabled{opacity:.55;cursor:wait}
@@ -62,16 +57,10 @@ footer{min-height:136px;padding:34px 0;background:#111;color:#fff;display:flex;a
 <main>
 <p class="eyebrow">Сообщество / Пользователи</p>
 <h1>Список<br>пользователей.</h1>
-<p class="intro">Открытые профили сообщества. Здесь отображаются только никнейм, описание и фотография — email и адреса кошельков не публикуются.</p>
+<p class="intro">Открытые профили сообщества. Здесь видны никнейм, описание и фотография; email и кошельки не публикуются. Профили появляются после посещения личного кабинета. Метка SCAM — публичное решение создателя сайта, она не блокирует аккаунт.</p>
 <section class="admin-tools hidden" id="adminTools" aria-labelledby="adminToolsTitle">
 <h2 id="adminToolsTitle">Управление сообществом</h2>
-<p>Инструменты создателя сайта. UID пользователей доступен только администраторам.</p>
-<div class="admin-actions">
-<button type="button" id="syncProfiles">Синхронизировать профили</button>
-<input id="unbanUid" type="text" maxlength="128" autocomplete="off" aria-label="Firebase UID для разблокировки" placeholder="Firebase UID для разблокировки">
-<button type="button" id="unbanUser">Разблокировать</button>
-</div>
-<div class="admin-status" id="adminStatus" aria-live="polite"></div>
+<p>Чтобы поставить или снять метку SCAM, откройте профиль пользователя. Метка будет видна всем посетителям.</p>
 </section>
 <p class="status" id="usersStatus" aria-live="polite">Загружаем пользователей…</p>
 <div class="user-list" id="userList"></div>
@@ -84,213 +73,6 @@ footer{min-height:136px;padding:34px 0;background:#111;color:#fff;display:flex;a
 <div class="copy">© 2026</div>
 </div>
 </footer>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
-
-const FUNCTIONS_URL = "https://us-central1-physical-numbers.cloudfunctions.net";
-const USER_PAGE_SIZE = 24;
-const userList = document.getElementById( "userList" );
-const usersStatus = document.getElementById( "usersStatus" );
-const usersMore = document.getElementById( "usersMore" );
-const adminTools = document.getElementById( "adminTools" );
-const adminStatus = document.getElementById( "adminStatus" );
-const syncProfilesButton = document.getElementById( "syncProfiles" );
-const unbanUidInput = document.getElementById( "unbanUid" );
-const unbanUserButton = document.getElementById( "unbanUser" );
-let nextPageToken = "";
-let currentUser = null;
-let currentUserIsAdmin = false;
-let directoryRequestId = 0;
-
-const app = initializeApp( {
-apiKey: "AIzaSyBqGLonGIt2m_55dt1DWjzhLGnL7m6N0J4",
-authDomain: "physical-numbers.firebaseapp.com",
-projectId: "physical-numbers",
-storageBucket: "physical-numbers.firebasestorage.app",
-messagingSenderId: "1031207446971",
-appId: "1:1031207446971:web:ed03e122d4727f8e28fc9e",
-measurementId: "G-S8J83CEQWL"
-} );
-const auth = getAuth( app );
-
-function readString( fields, name ) {
-const rawValue = fields && fields[name];
-const value = typeof rawValue === "string"
-? rawValue
-: rawValue && rawValue.stringValue;
-return typeof value === "string" ? value : "";
-}
-
-function createUserLink( user ) {
-const id = typeof user.id === "string" ? user.id : "";
-if (!id || id.includes( "/" )) {
-return null;
-}
-const name = readString( user, "nickname" ).trim()
-|| readString( user, "googleName" ).trim()
-|| "Пользователь";
-const description = readString( user, "description" ).trim();
-const avatar = readString( user, "avatarUrl" );
-const link = document.createElement( "a" );
-link.className = "user-link";
-link.href = "user.html?" + new URLSearchParams( { id: id } ).toString();
-const avatarElement = document.createElement(
-avatar.startsWith( "data:image/" ) || avatar.startsWith( "https://" ) ? "img" : "div"
-);
-const isImage = avatarElement.tagName === "IMG";
-avatarElement.className = isImage ? "avatar" : "avatar avatar-placeholder";
-if (isImage) {
-avatarElement.src = avatar;
-avatarElement.alt = "Аватар пользователя " + name;
-} else {
-avatarElement.setAttribute( "aria-hidden", "true" );
-avatarElement.textContent = Array.from( name )[0] || "?";
-}
-const copy = document.createElement( "div" );
-copy.className = "user-copy";
-const heading = document.createElement( "div" );
-heading.className = "user-heading";
-const title = document.createElement( "h2" );
-title.textContent = name;
-heading.appendChild( title );
-if (user.isCreator) {
-const badge = document.createElement( "span" );
-badge.className = "creator-badge";
-badge.textContent = "Создатель";
-heading.appendChild( badge );
-}
-copy.appendChild( heading );
-if (description) {
-const descriptionElement = document.createElement( "p" );
-descriptionElement.textContent = description;
-copy.appendChild( descriptionElement );
-}
-link.append( avatarElement, copy );
-return link;
-}
-
-async function loadUsers( append = false ) {
-const requestId = ++directoryRequestId;
-usersMore.disabled = true;
-if (!append) {
-usersStatus.textContent = "Загружаем пользователей…";
-}
-try {
-const params = new URLSearchParams( { pageSize: String( USER_PAGE_SIZE ) } );
-if (append && nextPageToken) {
-params.set( "pageToken", nextPageToken );
-}
-const headers = { Accept: "application/json" };
-if (currentUser) {
-headers.Authorization = "Bearer " + await currentUser.getIdToken();
-}
-const response = await fetch( FUNCTIONS_URL + "/publicUsers?" + params.toString(), {
-headers,
-cache: "no-store"
-} );
-if (requestId !== directoryRequestId) {
-return;
-}
-if (!response.ok) {
-const errorResult = await response.json().catch( function () { return {}; } );
-throw new Error( errorResult.error || "HTTP " + response.status );
-}
-const result = await response.json();
-currentUserIsAdmin = result.isAdmin === true;
-adminTools.classList.toggle( "hidden", !currentUserIsAdmin );
-const users = Array.isArray( result.users ) ? result.users : [];
-users.forEach( function (user) {
-const link = createUserLink( user );
-if (link) {
-userList.appendChild( link );
-}
-} );
-nextPageToken = result.nextPageToken || "";
-usersMore.classList.toggle( "hidden", !nextPageToken );
-usersStatus.textContent = userList.childElementCount
-? "Пользователей: " + userList.childElementCount
-: "Пока нет пользователей с профилями.";
-} catch (error) {
-if (requestId !== directoryRequestId) {
-return;
-}
-console.error( "Не удалось загрузить список пользователей:", error );
-usersStatus.textContent = "Не удалось загрузить список пользователей. Проверьте подключение Firebase Functions и доступность каталога.";
-usersMore.classList.add( "hidden" );
-} finally {
-if (requestId === directoryRequestId) {
-usersMore.disabled = false;
-}
-}
-}
-
-async function postAdminAction( endpoint, payload ) {
-if (!currentUser || !currentUserIsAdmin) {
-throw new Error( "Для этого действия нужны права создателя сайта." );
-}
-const response = await fetch( FUNCTIONS_URL + "/" + endpoint, {
-method: "POST",
-headers: {
-Authorization: "Bearer " + await currentUser.getIdToken(),
-Accept: "application/json",
-"Content-Type": "application/json"
-},
-body: JSON.stringify( payload )
-} );
-const result = await response.json().catch( function () { return {}; } );
-if (!response.ok) {
-throw new Error( result.error || "HTTP " + response.status );
-}
-return result;
-}
-
-syncProfilesButton.addEventListener( "click", async function () {
-syncProfilesButton.disabled = true;
-adminStatus.textContent = "Синхронизируем публичные профили…";
-try {
-const result = await postAdminAction( "syncPublicProfiles", {} );
-adminStatus.textContent = "Синхронизировано профилей: " + result.synced;
-} catch (error) {
-console.error( "Не удалось синхронизировать профили:", error );
-adminStatus.textContent = error.message || "Не удалось синхронизировать профили.";
-} finally {
-syncProfilesButton.disabled = false;
-}
-} );
-
-unbanUserButton.addEventListener( "click", async function () {
-const uid = unbanUidInput.value.trim();
-if (!uid || !window.confirm( "Разблокировать пользователя с этим Firebase UID?" )) {
-return;
-}
-unbanUserButton.disabled = true;
-adminStatus.textContent = "Разблокируем пользователя…";
-try {
-await postAdminAction( "moderateUser", { action: "unban", targetUid: uid } );
-unbanUidInput.value = "";
-adminStatus.textContent = "Пользователь разблокирован.";
-await loadUsers();
-} catch (error) {
-console.error( "Не удалось разблокировать пользователя:", error );
-adminStatus.textContent = error.message || "Не удалось разблокировать пользователя.";
-} finally {
-unbanUserButton.disabled = false;
-}
-} );
-
-usersMore.addEventListener( "click", function () {
-void loadUsers( true );
-} );
-
-onAuthStateChanged( auth, function (user) {
-currentUser = user;
-currentUserIsAdmin = false;
-nextPageToken = "";
-userList.replaceChildren();
-adminTools.classList.add( "hidden" );
-void loadUsers();
-} );
-</script>
+<script type="module" src="users-directory.js"></script>
 </body>
 </html>

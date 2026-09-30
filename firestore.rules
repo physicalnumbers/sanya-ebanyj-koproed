@@ -6,8 +6,8 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function notBanned(uid) {
-      return !exists(/databases/$(database)/documents/bannedUsers/$(uid));
+    function isAdmin() {
+      return signedIn() && request.auth.token.admin == true;
     }
 
     function allowedProfileFields() {
@@ -21,6 +21,7 @@ service cloud.firestore {
         "tonWalletAddress",
         "tonWalletChain",
         "tonWalletAppName",
+        "publicProfileId",
         "updatedAt"
       ];
     }
@@ -43,7 +44,10 @@ service cloud.firestore {
         )
         && (
           !request.resource.data.keys().hasAny(["googleName"])
-          || request.resource.data.googleName is string
+          || (
+            request.resource.data.googleName is string
+            && request.resource.data.googleName.size() <= 200
+          )
         )
         && (
           !request.resource.data.keys().hasAny(["avatarUrl"])
@@ -74,28 +78,113 @@ service cloud.firestore {
           !request.resource.data.keys().hasAny(["tonWalletAppName"])
           || request.resource.data.tonWalletAppName is string
         )
+        && (
+          !request.resource.data.keys().hasAny(["publicProfileId"])
+          || (
+            request.resource.data.publicProfileId is string
+            && request.resource.data.publicProfileId.matches("^[A-Za-z0-9_-]{36}$")
+          )
+        )
         && request.resource.data.updatedAt is timestamp;
     }
 
+    function validPublicProfile() {
+      return request.resource.data.keys().hasOnly([
+          "nickname",
+          "description",
+          "googleName",
+          "avatarUrl",
+          "isScam",
+          "isCreator"
+        ])
+        && request.resource.data.nickname is string
+        && request.resource.data.nickname.size() <= 40
+        && request.resource.data.description is string
+        && request.resource.data.description.size() <= 500
+        && request.resource.data.googleName is string
+        && request.resource.data.googleName.size() <= 200
+        && request.resource.data.avatarUrl is string
+        && request.resource.data.avatarUrl.size() <= 700000
+        && request.resource.data.isScam is bool
+        && request.resource.data.isCreator is bool;
+    }
+
+    function profileBelongsToCaller(profileId) {
+      return signedIn()
+        && getAfter(
+          /databases/$(database)/documents/privateProfileOwners/$(profileId)
+        ).data.uid == request.auth.uid;
+    }
+
     match /users/{uid} {
-      allow get: if signedIn() && request.auth.uid == uid && notBanned(uid);
+      allow get: if signedIn() && request.auth.uid == uid;
       allow list: if false;
       allow create: if signedIn()
         && request.auth.uid == uid
-        && notBanned(uid)
         && request.resource.data.keys().hasOnly(allowedProfileFields())
         && validProfile(uid);
       allow update: if signedIn()
         && request.auth.uid == uid
-        && notBanned(uid)
         && request.resource.data.diff(resource.data).affectedKeys()
           .hasOnly(allowedProfileFields())
-        && validProfile(uid);
+        && validProfile(uid)
+        && (
+          !resource.data.keys().hasAny(["publicProfileId"])
+          || request.resource.data.publicProfileId == resource.data.publicProfileId
+        );
       allow delete: if false;
+    }
+
+    match /privateProfileOwners/{profileId} {
+      allow get, list: if false;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(["uid"])
+        && request.resource.data.uid == request.auth.uid
+        && getAfter(
+          /databases/$(database)/documents/users/$(request.auth.uid)
+        ).data.publicProfileId == profileId;
+      allow update, delete: if false;
     }
 
     match /publicUsers/{profileId} {
       allow read, write: if false;
+    }
+
+    match /communityProfiles/{profileId} {
+      allow get, list: if true;
+      allow create: if profileBelongsToCaller(profileId)
+        && validPublicProfile()
+        && request.resource.data.isScam == false
+        && request.resource.data.isCreator == isAdmin();
+      allow update: if validPublicProfile()
+        && (
+          (
+            isAdmin()
+            && get(
+              /databases/$(database)/documents/users/$(request.auth.uid)
+            ).data.publicProfileId != profileId
+            && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(["isScam"])
+          )
+          || (
+            isAdmin()
+            && get(
+              /databases/$(database)/documents/users/$(request.auth.uid)
+            ).data.publicProfileId == profileId
+            && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(["isCreator"])
+            && request.resource.data.isCreator == true
+            && request.resource.data.isScam == resource.data.isScam
+          )
+          || (
+            profileBelongsToCaller(profileId)
+            && request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(["nickname", "description", "googleName", "avatarUrl"])
+            && request.resource.data.isScam == resource.data.isScam
+            && request.resource.data.isCreator == resource.data.isCreator
+          )
+        );
+      allow delete: if false;
     }
 
     match /bannedUsers/{uid} {
