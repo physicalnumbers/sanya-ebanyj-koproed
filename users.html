@@ -20,15 +20,17 @@ main{min-height:calc(100vh - 210px);padding:76px 0 100px}
 h1{margin:0;font-size:clamp(44px,8vw,88px);font-weight:500;letter-spacing:-5px;line-height:.95}
 .intro{max-width:610px;margin:24px 0 48px;color:#666;font-size:16px;line-height:1.65}
 .status{min-height:22px;margin-bottom:20px;color:#777;line-height:1.6}
-.user-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border:1px solid #d0d0d0;background:#d0d0d0;gap:1px}
-.user-link{min-width:0;min-height:142px;padding:24px;display:flex;align-items:flex-start;gap:18px;background:#f5f5f5;text-decoration:none;transition:background .2s}
+.user-list{border-top:1px solid #d0d0d0}
+.user-link{position:relative;min-width:0;min-height:96px;padding:18px 44px 18px 4px;display:flex;align-items:center;gap:16px;border-bottom:1px solid #d0d0d0;background:#f5f5f5;text-decoration:none;transition:background .2s}
+.user-link::after{content:"↗";position:absolute;right:8px;top:50%;color:#999;font-size:20px;transform:translateY(-50%);transition:color .2s,transform .2s}
 .user-link:hover{background:#fff}
+.user-link:hover::after{color:#111;transform:translate(2px,-50%)}
 .user-link:focus-visible,.more:focus-visible{outline:2px solid #111;outline-offset:3px;z-index:1}
-.avatar{width:58px;height:58px;flex:0 0 58px;border-radius:50%;object-fit:cover;background:#e5e5e5;color:#555}
+.avatar{width:54px;height:54px;flex:0 0 54px;border-radius:50%;object-fit:cover;background:#e5e5e5;color:#555}
 .avatar-placeholder{display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:600}
 .user-copy{min-width:0}
-.user-copy h2{margin:2px 0 0;font-size:18px;font-weight:500;overflow-wrap:anywhere}
-.user-copy p{margin:9px 0 0;color:#666;font-size:13px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.user-copy h2{margin:0;font-size:16px;font-weight:600;overflow-wrap:anywhere}
+.user-copy p{margin:6px 0 0;color:#777;font-size:13px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .more{min-height:46px;margin-top:24px;padding:0 20px;border:1px solid #111;background:#111;color:#fff;cursor:pointer;font:14px Arial}
 .more:hover{background:transparent;color:#111}
 .more:disabled{opacity:.55;cursor:wait}
@@ -37,7 +39,7 @@ footer{min-height:136px;padding:34px 0;background:#111;color:#fff;display:flex;a
 .footer-inner{display:flex;justify-content:space-between;align-items:center;gap:24px}
 .footer-title{font-size:20px}
 .copy{color:#888}
-@media(max-width:700px){.container{width:calc(100% - 32px)}main{padding:55px 0 70px}h1{letter-spacing:-3px}.intro{margin:20px 0 34px}.user-list{grid-template-columns:1fr}.user-link{min-height:122px;padding:20px}.footer-inner{align-items:flex-start;flex-direction:column;gap:16px}}
+@media(max-width:700px){.container{width:calc(100% - 32px)}main{padding:55px 0 70px}h1{letter-spacing:-3px}.intro{margin:20px 0 34px}.user-link{min-height:84px;padding:14px 38px 14px 2px;gap:13px}.avatar{width:48px;height:48px;flex-basis:48px}.footer-inner{align-items:flex-start;flex-direction:column;gap:16px}}
 </style>
 </head>
 <body>
