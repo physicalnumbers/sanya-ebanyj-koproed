@@ -1,0 +1,109 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function notBanned(uid) {
+      return !exists(/databases/$(database)/documents/bannedUsers/$(uid));
+    }
+
+    function allowedProfileFields() {
+      return [
+        "uid",
+        "nickname",
+        "description",
+        "googleName",
+        "avatarUrl",
+        "avatarDataUrl",
+        "tonWalletAddress",
+        "tonWalletChain",
+        "tonWalletAppName",
+        "updatedAt"
+      ];
+    }
+
+    function validProfile(uid) {
+      return request.resource.data.uid == uid
+        && (
+          !request.resource.data.keys().hasAny(["nickname"])
+          || (
+            request.resource.data.nickname is string
+            && request.resource.data.nickname.size() <= 40
+          )
+        )
+        && (
+          !request.resource.data.keys().hasAny(["description"])
+          || (
+            request.resource.data.description is string
+            && request.resource.data.description.size() <= 500
+          )
+        )
+        && (
+          !request.resource.data.keys().hasAny(["googleName"])
+          || request.resource.data.googleName is string
+        )
+        && (
+          !request.resource.data.keys().hasAny(["avatarUrl"])
+          || (
+            request.resource.data.avatarUrl is string
+            && request.resource.data.avatarUrl.size() <= 700000
+          )
+        )
+        && (
+          !request.resource.data.keys().hasAny(["avatarDataUrl"])
+          || (
+            request.resource.data.avatarDataUrl is string
+            && request.resource.data.avatarDataUrl.size() <= 700000
+          )
+        )
+        && (
+          !request.resource.data.keys().hasAny(["tonWalletAddress"])
+          || (
+            request.resource.data.tonWalletAddress is string
+            && request.resource.data.tonWalletAddress.size() <= 128
+          )
+        )
+        && (
+          !request.resource.data.keys().hasAny(["tonWalletChain"])
+          || request.resource.data.tonWalletChain is string
+        )
+        && (
+          !request.resource.data.keys().hasAny(["tonWalletAppName"])
+          || request.resource.data.tonWalletAppName is string
+        )
+        && request.resource.data.updatedAt is timestamp;
+    }
+
+    match /users/{uid} {
+      allow get: if signedIn() && request.auth.uid == uid && notBanned(uid);
+      allow list: if false;
+      allow create: if signedIn()
+        && request.auth.uid == uid
+        && notBanned(uid)
+        && request.resource.data.keys().hasOnly(allowedProfileFields())
+        && validProfile(uid);
+      allow update: if signedIn()
+        && request.auth.uid == uid
+        && notBanned(uid)
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(allowedProfileFields())
+        && validProfile(uid);
+      allow delete: if false;
+    }
+
+    match /publicUsers/{profileId} {
+      allow read, write: if false;
+    }
+
+    match /bannedUsers/{uid} {
+      allow read, write: if false;
+    }
+
+    match /siteSettings/{settingId} {
+      allow read, write: if false;
+    }
+  }
+}
