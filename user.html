@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Публичный профиль пользователя сообщества «Физические Номера».">
+<title>Профиль пользователя — Физические Номера</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;scroll-behavior:smooth}
+body{background:#f5f5f5;color:#111;font:14px Arial,Helvetica,sans-serif}
+a{color:inherit}
+.container{width:min(100% - 48px,1100px);margin:0 auto}
+.topbar{height:74px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #d8d8d8}
+.logo{font-size:18px;font-weight:600;text-decoration:none}
+.back-link{color:#555;text-decoration:none}
+.back-link:hover{color:#111}
+main{min-height:calc(100vh - 210px);padding:76px 0 100px}
+.eyebrow{margin:0 0 24px;color:#888;font-size:12px;letter-spacing:2px;text-transform:uppercase}
+.profile{max-width:760px;padding:clamp(24px,6vw,56px);border:1px solid #d8d8d8;background:#fafafa}
+.profile-heading{display:flex;align-items:center;gap:28px}
+.avatar{width:132px;height:132px;flex:0 0 132px;border-radius:50%;object-fit:cover;background:#e5e5e5;color:#555}
+.avatar-placeholder{display:flex;align-items:center;justify-content:center;font-size:46px;font-weight:600}
+h1{margin:0;font-size:clamp(34px,6vw,58px);font-weight:500;letter-spacing:-3px;line-height:1;overflow-wrap:anywhere}
+.description{margin:36px 0 0;color:#555;font-size:16px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere}
+.empty-description{color:#888}
+.status{min-height:22px;margin-top:24px;color:#777;line-height:1.6}
+.notice{max-width:760px;margin:22px 0 0;color:#888;font-size:12px;line-height:1.6}
+.hidden{display:none!important}
+footer{min-height:136px;padding:34px 0;background:#111;color:#fff;display:flex;align-items:center}
+.footer-inner{display:flex;justify-content:space-between;align-items:center;gap:24px}
+.footer-title{font-size:20px}
+.copy{color:#888}
+@media(max-width:600px){.container{width:calc(100% - 32px)}main{padding:54px 0 70px}.profile{padding:24px}.profile-heading{align-items:flex-start;gap:18px}.avatar{width:88px;height:88px;flex-basis:88px}.avatar-placeholder{font-size:32px}h1{letter-spacing:-2px}.description{margin-top:26px;font-size:15px}.footer-inner{align-items:flex-start;flex-direction:column;gap:16px}}
+</style>
+</head>
+<body>
+<div class="container">
+<header class="topbar">
+<a class="logo" href="index.html">Физические Номера</a>
+<a class="back-link" href="users.html">К списку пользователей</a>
+</header>
+<main>
+<p class="eyebrow">Сообщество / Профиль</p>
+<article class="profile hidden" id="profile" aria-live="polite">
+<div class="profile-heading">
+<div class="avatar avatar-placeholder" id="avatar" aria-hidden="true">?</div>
+<h1 id="nickname">Пользователь</h1>
+</div>
+<p class="description" id="description"></p>
+</article>
+<p class="status" id="profileStatus" aria-live="polite">Загружаем профиль…</p>
+<p class="notice hidden" id="publicNotice">Это публичная часть профиля. Email и адрес кошелька не отображаются.</p>
+</main>
+</div>
+<footer>
+<div class="container footer-inner">
+<div class="footer-title">Физические Номера</div>
+<div class="copy">© 2026</div>
+</div>
+</footer>
+<script type="module">
+const USERS_API_URL = "https://firestore.googleapis.com/v1/projects/physical-numbers/databases/(default)/documents/users";
+const USERS_API_KEY = "AIzaSyBqGLonGIt2m_55dt1DWjzhLGnL7m6N0J4";
+const profileFields = [ "nickname", "googleName", "description", "avatarUrl", "avatarDataUrl" ];
+const profileElement = document.getElementById( "profile" );
+const profileStatus = document.getElementById( "profileStatus" );
+const publicNotice = document.getElementById( "publicNotice" );
+const avatar = document.getElementById( "avatar" );
+const nicknameElement = document.getElementById( "nickname" );
+const descriptionElement = document.getElementById( "description" );
+
+function readString( fields, name ) {
+const value = fields && fields[name] && fields[name].stringValue;
+return typeof value === "string" ? value : "";
+}
+
+function showProfile( fields ) {
+const nickname = readString( fields, "nickname" ).trim()
+|| readString( fields, "googleName" ).trim()
+|| "Пользователь";
+const description = readString( fields, "description" ).trim();
+const avatarValue = readString( fields, "avatarUrl" )
+|| readString( fields, "avatarDataUrl" );
+nicknameElement.textContent = nickname;
+document.title = nickname + " — Физические Номера";
+descriptionElement.textContent = description || "Пользователь пока ничего не рассказал о себе.";
+descriptionElement.classList.toggle( "empty-description", !description );
+if ( avatarValue.startsWith( "data:image/" ) || avatarValue.startsWith( "https://" ) ) {
+const image = document.createElement( "img" );
+image.className = "avatar";
+image.alt = "Аватар пользователя " + nickname;
+image.src = avatarValue;
+avatar.replaceWith( image );
+} else {
+avatar.textContent = Array.from( nickname )[0] || "?";
+}
+profileElement.classList.remove( "hidden" );
+profileStatus.classList.add( "hidden" );
+publicNotice.classList.remove( "hidden" );
+}
+
+async function loadProfile() {
+const id = new URLSearchParams( window.location.search ).get( "id" );
+if (!id || id.includes( "/" ) || id.length > 256) {
+profileStatus.textContent = "Не удалось определить пользователя. Вернитесь к списку и выберите профиль ещё раз.";
+return;
+}
+const params = new URLSearchParams( { key: USERS_API_KEY } );
+profileFields.forEach( function (field) {
+params.append( "mask.fieldPaths", field );
+} );
+try {
+const response = await fetch(
+USERS_API_URL + "/" + encodeURIComponent( id ) + "?" + params.toString(),
+{ headers: { Accept: "application/json" }, cache: "no-store" }
+);
+if (response.status === 404) {
+profileStatus.textContent = "Профиль не найден. Возможно, он был удалён.";
+return;
+}
+if (!response.ok) {
+throw new Error( "Firestore вернул HTTP " + response.status );
+}
+const result = await response.json();
+showProfile( result.fields || {} );
+} catch (error) {
+console.error( "Не удалось загрузить профиль пользователя:", error );
+profileStatus.textContent = "Не удалось загрузить профиль. Попробуйте обновить страницу.";
+}
+}
+
+void loadProfile();
+</script>
+</body>
+</html>
