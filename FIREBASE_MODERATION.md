@@ -1,56 +1,56 @@
-# Firebase moderation setup
+# Free user directory and SCAM labels
 
-The public directory and moderation tools use Firebase Cloud Functions. A hidden
-button in the static site is not an authorization boundary: the functions verify
-Firebase ID tokens and require the `admin` custom claim for account IDs,
-moderation, and directory synchronization.
+The user directory runs on GitHub Pages and Cloud Firestore. It does not call
+Cloud Functions, so deploying this version does not require the Blaze plan.
 
-## One-time deployment
+## One-time setup
 
-1. Use Node.js 22 or later, install the Firebase CLI, and sign in with an account
-   that can deploy to the `physical-numbers` Firebase project.
-2. Make sure the project can deploy Cloud Functions (the Firebase project may
-   need the Blaze billing plan) and that Cloud Functions and Cloud Build APIs are
-   enabled.
-3. Authenticate the Firebase Admin SDK with Google Application Default
-   Credentials (`gcloud auth application-default login`), or set
-   `GOOGLE_APPLICATION_CREDENTIALS` to a service-account key stored outside
-   this repository. Never commit a service-account key.
-4. Install the function dependencies and deploy the server functions and
-   Firestore rules:
+1. In Firebase Console, make sure Firestore Database and Google sign-in in
+   Firebase Authentication are enabled for the `physical-numbers` project.
+2. Install Node.js and Firebase CLI, then sign in and deploy only Firestore
+   rules:
 
    ```powershell
-   npm --prefix functions install
-   firebase deploy --only firestore:rules,functions --project physical-numbers
+   firebase login
+   firebase deploy --only firestore:rules --project physical-numbers
    ```
 
-5. In Firebase Console, open **Authentication → Users**, copy the creator's
-   Firebase **UID**, then grant the admin claim:
+   These rules and the directory use the free Spark plan within Firebase's
+   applicable quotas. Do not deploy Cloud Functions for this directory.
+3. To enable owner-only SCAM labels, copy the creator's Firebase UID from
+   **Firebase Console → Authentication → Users**. On a trusted computer, set
+   up Google Application Default Credentials:
 
    ```powershell
+   gcloud auth application-default login
+   npm --prefix functions install
    npm --prefix functions run set-admin -- YOUR_FIREBASE_UID
    ```
 
-   This command uses Application Default Credentials and preserves any other
-   custom claims already assigned to the account. It does not accept an email
-   address as the administrator identity.
-6. Sign out of the site and sign back in so Firebase issues an ID token with the
-   new claim. Open the user directory and use **Synchronize public profiles**
-   once to create public, privacy-filtered directory records for existing
-   accounts.
+   The script preserves other custom claims, grants `admin: true`, and records
+   the owner. It uses the Firebase Admin SDK locally; it does not deploy a
+   Cloud Function. Never share or commit service-account keys.
+4. Sign out of the site and sign in again so Firebase refreshes the ID token.
+   Visit the personal profile page while signed in. Existing profiles are
+   copied into the public directory automatically; new profiles appear after
+   they are saved.
 
-## Access model
+## What the label does
 
-- Users can read and change only their own profile document. Firestore rules
-  prevent clients from listing other private user documents or writing
-  moderation state.
-- Cloud Functions maintain a separate directory projection. Firestore rules
-  deny clients direct access to it; public responses include only nickname,
-  description, avatar, and an opaque profile ID. Actual Firebase UIDs are
-  returned only to authenticated administrators.
-- Only accounts with the server-verified `admin: true` custom claim can see
-  moderation controls, inspect Firebase UIDs, or ban/unban accounts.
-- Blocking disables the Firebase Authentication account, revokes refresh
-  tokens, denies its Firestore profile access, and removes it from the public
-  directory. Unblocking restores the account's previous disabled state.
-- The creator's own profile is pinned above the directory for every visitor.
+- Visitors can read only the public nickname, description, avatar, creator
+  indicator, and SCAM indicator in `communityProfiles`. Email, wallet addresses,
+  and Firebase UIDs are not included in those documents. A separate
+  `privateProfileOwners` mapping binds each random profile ID to its owner and
+  cannot be read or changed by clients.
+- Users can create/update only their own public profile. Firestore Rules reserve
+  the SCAM flag for accounts carrying the administrator custom claim.
+- The creator opens a user's profile and selects **Отметить как SCAM** or
+  **Снять метку SCAM**. The label appears next to the nickname in the directory
+  and on the profile page.
+- This is a public warning label, not an account ban or an independently
+  verified finding. Use it only after checking reliable evidence.
+- The old `publicUsers` collection remains inaccessible to clients. The new
+  directory uses random profile IDs and never publishes Firebase UIDs.
+
+Firebase Spark quotas still apply. The site does not disable or delete a user's
+Firebase Authentication account.
