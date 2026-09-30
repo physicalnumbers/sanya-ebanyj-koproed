@@ -41,7 +41,11 @@ async function ensurePublicProfile(user, profileSnapshot) {
     return;
   }
 
-  const privateProfile = profileSnapshot.data();
+  const latestProfile = await getDoc(doc(db, "users", user.uid));
+  if (!latestProfile.exists()) {
+    return;
+  }
+  const privateProfile = latestProfile.data();
   const profileId = privateProfile.publicProfileId || crypto.randomUUID();
   const publicRef = doc(db, "communityProfiles", profileId);
   const publicSnapshot = await getDoc(publicRef);
