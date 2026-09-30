@@ -26,6 +26,14 @@ h1{margin:0;font-size:clamp(34px,6vw,58px);font-weight:500;letter-spacing:-3px;l
 .empty-description{color:#888}
 .status{min-height:22px;margin-top:24px;color:#777;line-height:1.6}
 .notice{max-width:760px;margin:22px 0 0;color:#888;font-size:12px;line-height:1.6}
+.admin-panel{max-width:760px;margin-top:24px;padding:18px;border:1px solid #d0d0d0;background:#eee}
+.admin-panel h2{margin:0 0 10px;font-size:14px;font-weight:600}
+.admin-uid{margin:0 0 14px;color:#555;font-family:monospace;font-size:13px;overflow-wrap:anywhere}
+.admin-button{min-height:42px;padding:0 15px;border:1px solid #111;background:#111;color:#fff;cursor:pointer;font:13px Arial}
+.admin-button:hover{background:transparent;color:#111}
+.admin-button:disabled{opacity:.55;cursor:wait}
+.admin-status{min-height:18px;margin-top:10px;color:#666;font-size:12px;line-height:1.5}
+.creator-badge{display:inline-block;margin-top:10px;padding:5px 8px;border:1px solid #d0d0d0;color:#777;font-size:10px;letter-spacing:1px;text-transform:uppercase}
 .hidden{display:none!important}
 footer{min-height:136px;padding:34px 0;background:#111;color:#fff;display:flex;align-items:center}
 .footer-inner{display:flex;justify-content:space-between;align-items:center;gap:24px}
@@ -45,12 +53,21 @@ footer{min-height:136px;padding:34px 0;background:#111;color:#fff;display:flex;a
 <article class="profile hidden" id="profile" aria-live="polite">
 <div class="profile-heading">
 <div class="avatar avatar-placeholder" id="avatar" aria-hidden="true">?</div>
+<div>
 <h1 id="nickname">Пользователь</h1>
+<span class="creator-badge hidden" id="creatorBadge">Создатель сайта</span>
+</div>
 </div>
 <p class="description" id="description"></p>
 </article>
 <p class="status" id="profileStatus" aria-live="polite">Загружаем профиль…</p>
 <p class="notice hidden" id="publicNotice">Это публичная часть профиля. Email и адрес кошелька не отображаются.</p>
+<section class="admin-panel hidden" id="adminPanel" aria-labelledby="adminTitle">
+<h2 id="adminTitle">Управление пользователем</h2>
+<p class="admin-uid" id="adminUid"></p>
+<button class="admin-button" id="moderateButton" type="button"></button>
+<div class="admin-status" id="moderationStatus" aria-live="polite"></div>
+</section>
 </main>
 </div>
 <footer>
@@ -60,28 +77,51 @@ footer{min-height:136px;padding:34px 0;background:#111;color:#fff;display:flex;a
 </div>
 </footer>
 <script type="module">
-const USERS_API_URL = "https://firestore.googleapis.com/v1/projects/physical-numbers/databases/(default)/documents/users";
-const USERS_API_KEY = "AIzaSyBqGLonGIt2m_55dt1DWjzhLGnL7m6N0J4";
-const profileFields = [ "nickname", "googleName", "description", "avatarUrl", "avatarDataUrl" ];
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+const FUNCTIONS_URL = "https://us-central1-physical-numbers.cloudfunctions.net";
 const profileElement = document.getElementById( "profile" );
 const profileStatus = document.getElementById( "profileStatus" );
 const publicNotice = document.getElementById( "publicNotice" );
+const adminPanel = document.getElementById( "adminPanel" );
+const adminUid = document.getElementById( "adminUid" );
+const moderateButton = document.getElementById( "moderateButton" );
+const moderationStatus = document.getElementById( "moderationStatus" );
+const creatorBadge = document.getElementById( "creatorBadge" );
 const avatar = document.getElementById( "avatar" );
 const nicknameElement = document.getElementById( "nickname" );
 const descriptionElement = document.getElementById( "description" );
+const app = initializeApp( {
+apiKey: "AIzaSyBqGLonGIt2m_55dt1DWjzhLGnL7m6N0J4",
+authDomain: "physical-numbers.firebaseapp.com",
+projectId: "physical-numbers",
+storageBucket: "physical-numbers.firebasestorage.app",
+messagingSenderId: "1031207446971",
+appId: "1:1031207446971:web:ed03e122d4727f8e28fc9e",
+measurementId: "G-S8J83CEQWL"
+} );
+const auth = getAuth( app );
+let currentUser = null;
+let profileUid = "";
+let isAdmin = false;
+let isBanned = false;
+let isCreator = false;
 
 function readString( fields, name ) {
-const value = fields && fields[name] && fields[name].stringValue;
+const rawValue = fields && fields[name];
+const value = typeof rawValue === "string"
+? rawValue
+: rawValue && rawValue.stringValue;
 return typeof value === "string" ? value : "";
 }
 
-function showProfile( fields ) {
-const nickname = readString( fields, "nickname" ).trim()
-|| readString( fields, "googleName" ).trim()
+function showProfile( user ) {
+const nickname = readString( user, "nickname" ).trim()
+|| readString( user, "googleName" ).trim()
 || "Пользователь";
-const description = readString( fields, "description" ).trim();
-const avatarValue = readString( fields, "avatarUrl" )
-|| readString( fields, "avatarDataUrl" );
+const description = readString( user, "description" ).trim();
+const avatarValue = readString( user, "avatarUrl" );
 nicknameElement.textContent = nickname;
 document.title = nickname + " — Физические Номера";
 descriptionElement.textContent = description || "Пользователь пока ничего не рассказал о себе.";
@@ -98,6 +138,18 @@ avatar.textContent = Array.from( nickname )[0] || "?";
 profileElement.classList.remove( "hidden" );
 profileStatus.classList.add( "hidden" );
 publicNotice.classList.remove( "hidden" );
+isCreator = user.isCreator === true;
+creatorBadge.classList.toggle( "hidden", !isCreator );
+if ( isAdmin && profileUid ) {
+adminUid.textContent = "Firebase UID: " + profileUid;
+adminPanel.classList.remove( "hidden" );
+moderateButton.classList.toggle( "hidden", isCreator );
+updateModerationButton();
+}
+}
+
+function updateModerationButton() {
+moderateButton.textContent = isBanned ? "Разблокировать пользователя" : "Заблокировать пользователя";
 }
 
 async function loadProfile() {
@@ -106,14 +158,14 @@ if (!id || id.includes( "/" ) || id.length > 256) {
 profileStatus.textContent = "Не удалось определить пользователя. Вернитесь к списку и выберите профиль ещё раз.";
 return;
 }
-const params = new URLSearchParams( { key: USERS_API_KEY } );
-profileFields.forEach( function (field) {
-params.append( "mask.fieldPaths", field );
-} );
 try {
+const headers = { Accept: "application/json" };
+if (currentUser) {
+headers.Authorization = "Bearer " + await currentUser.getIdToken();
+}
 const response = await fetch(
-USERS_API_URL + "/" + encodeURIComponent( id ) + "?" + params.toString(),
-{ headers: { Accept: "application/json" }, cache: "no-store" }
+FUNCTIONS_URL + "/publicUsers?" + new URLSearchParams( { id: id } ).toString(),
+{ headers, cache: "no-store" }
 );
 if (response.status === 404) {
 profileStatus.textContent = "Профиль не найден. Возможно, он был удалён.";
@@ -123,14 +175,61 @@ if (!response.ok) {
 throw new Error( "Firestore вернул HTTP " + response.status );
 }
 const result = await response.json();
-showProfile( result.fields || {} );
+isAdmin = result.isAdmin === true;
+const user = result.user || {};
+profileUid = isAdmin && typeof user.uid === "string" ? user.uid : "";
+isBanned = isAdmin && user.isBanned === true;
+showProfile( user );
 } catch (error) {
 console.error( "Не удалось загрузить профиль пользователя:", error );
 profileStatus.textContent = "Не удалось загрузить профиль. Попробуйте обновить страницу.";
 }
 }
 
+moderateButton.addEventListener( "click", async function () {
+if (!isAdmin || !profileUid) {
+return;
+}
+const action = isBanned ? "unban" : "ban";
+const confirmation = isBanned
+? "Разблокировать этого пользователя?"
+: "Заблокировать пользователя? Он потеряет доступ к аккаунту и профилю.";
+if (!window.confirm( confirmation )) {
+return;
+}
+moderateButton.disabled = true;
+moderationStatus.textContent = action === "ban" ? "Блокируем пользователя…" : "Разблокируем пользователя…";
+try {
+const response = await fetch( FUNCTIONS_URL + "/moderateUser", {
+method: "POST",
+headers: {
+Authorization: "Bearer " + await currentUser.getIdToken(),
+Accept: "application/json",
+"Content-Type": "application/json"
+},
+body: JSON.stringify( { action: action, targetUid: profileUid } )
+} );
+const result = await response.json().catch( function () { return {}; } );
+if (!response.ok) {
+throw new Error( result.error || "HTTP " + response.status );
+}
+isBanned = action === "ban";
+updateModerationButton();
+moderationStatus.textContent = isBanned
+? "Пользователь заблокирован."
+: "Пользователь разблокирован.";
+} catch (error) {
+console.error( "Не удалось изменить статус пользователя:", error );
+moderationStatus.textContent = error.message || "Не удалось выполнить действие.";
+} finally {
+moderateButton.disabled = false;
+}
+} );
+
+onAuthStateChanged( auth, function (user) {
+currentUser = user;
 void loadProfile();
+} );
 </script>
 </body>
 </html>

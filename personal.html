@@ -135,6 +135,7 @@ const appName = wallet.device && wallet.device.appName ? wallet.device.appName :
 try {
 if ( address !== savedWalletAddress || chain !== savedWalletChain || appName !== savedWalletAppName ) {
 await setDoc( doc( db, "users", currentUser.uid ), {
+uid: currentUser.uid,
 tonWalletAddress: address,
 tonWalletChain: chain,
 tonWalletAppName: appName,
