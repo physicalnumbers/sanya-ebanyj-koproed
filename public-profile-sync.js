@@ -7,8 +7,7 @@ import {
   onSnapshot,
   serverTimestamp,
   setDoc,
-  updateDoc,
-  writeBatch
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -31,7 +30,8 @@ let pendingProfileSync = Promise.resolve();
 function reportSyncError(error) {
   console.error("Не удалось обновить публичный профиль:", error);
   if (status) {
-    status.textContent = "Профиль сохранён, но не удалось обновить публичную карточку. Проверьте правила Firestore.";
+    const code = typeof error.code === "string" ? " (" + error.code + ")" : "";
+    status.textContent = "Профиль сохранён, но публичная карточка не обновилась" + code + ". Повторите попытку позже.";
     status.className = "status error";
   }
 }
@@ -47,6 +47,17 @@ async function ensurePublicProfile(user, profileSnapshot) {
   }
   const privateProfile = latestProfile.data();
   const profileId = privateProfile.publicProfileId || crypto.randomUUID();
+  const privateProfileRef = doc(db, "users", user.uid);
+  if (privateProfile.publicProfileId !== profileId) {
+    await setDoc(privateProfileRef, {
+      publicProfileId: profileId,
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+  }
+
+  const ownerRef = doc(db, "privateProfileOwners", profileId);
+  await setDoc(ownerRef, { uid: user.uid });
+
   const publicRef = doc(db, "communityProfiles", profileId);
   const publicSnapshot = await getDoc(publicRef);
   const claims = await getIdTokenResult(user);
@@ -73,27 +84,12 @@ async function ensurePublicProfile(user, profileSnapshot) {
   }
 
   if (!publicSnapshot.exists()) {
-    const batch = writeBatch(db);
-    batch.set(doc(db, "users", user.uid), {
-      publicProfileId: profileId,
-      updatedAt: serverTimestamp()
-    }, { merge: true });
-    batch.set(doc(db, "privateProfileOwners", profileId), {
-      uid: user.uid
-    });
-    batch.set(publicRef, {
+    await setDoc(publicRef, {
       ...profile,
       isScam: false,
       isCreator: isAdmin
     });
-    await batch.commit();
   } else {
-    if (privateProfile.publicProfileId !== profileId) {
-      await setDoc(doc(db, "users", user.uid), {
-        publicProfileId: profileId,
-        updatedAt: serverTimestamp()
-      }, { merge: true });
-    }
     await setDoc(publicRef, profile, { merge: true });
     if (isAdmin && publicSnapshot.data().isCreator !== true) {
       await updateDoc(publicRef, { isCreator: true });
