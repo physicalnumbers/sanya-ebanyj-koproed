@@ -22,6 +22,10 @@ const firebaseConfig = {
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const theme = document.createElement("link");
+theme.rel = "stylesheet";
+theme.href = new URL("personal.css", import.meta.url).href;
+document.head.appendChild(theme);
 const status = document.getElementById("status");
 let stopProfileListener = null;
 let publishedProfileFingerprint = "";
