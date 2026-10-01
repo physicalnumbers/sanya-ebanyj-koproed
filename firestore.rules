@@ -111,7 +111,7 @@ service cloud.firestore {
 
     function profileBelongsToCaller(profileId) {
       return signedIn()
-        && getAfter(
+        && get(
           /databases/$(database)/documents/privateProfileOwners/$(profileId)
         ).data.uid == request.auth.uid;
     }
@@ -137,13 +137,13 @@ service cloud.firestore {
 
     match /privateProfileOwners/{profileId} {
       allow get, list: if false;
-      allow create: if signedIn()
+      allow create, update: if signedIn()
         && request.resource.data.keys().hasOnly(["uid"])
         && request.resource.data.uid == request.auth.uid
-        && getAfter(
+        && get(
           /databases/$(database)/documents/users/$(request.auth.uid)
         ).data.publicProfileId == profileId;
-      allow update, delete: if false;
+      allow delete: if false;
     }
 
     match /publicUsers/{profileId} {
